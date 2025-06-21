@@ -5,8 +5,8 @@
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --color-background-custom: var(--background-custom);
+  --color-foreground: var(--foreground);
   --color-foreground-custom: var(--foreground-custom);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -26,6 +26,8 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-border-custom: var(--border-custom);
+  --color-border-custom-light: var(--border-custom-light);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -33,6 +35,7 @@
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-custom: var(--secondary-custom);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
@@ -43,12 +46,12 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-main: var(--main);
+  --color-off: var(--off);
 }
 
 :root {
   --radius: 0.625rem;
-  --background-custom: oklch(0.9843 0.004 106.4719);
-  --foreground-custom: oklch(0.1776 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.147 0.004 49.25);
   --popover: oklch(1 0 0);
@@ -56,6 +59,7 @@
   --primary: oklch(0.216 0.006 56.043);
   --primary-foreground: oklch(0.985 0.001 106.423);
   --secondary: oklch(0.97 0.001 106.424);
+  --secondary-custom: oklch(0.963 0.007 106.523);
   --secondary-foreground: oklch(0.216 0.006 56.043);
   --muted: oklch(0.97 0.001 106.424);
   --muted-foreground: oklch(0.553 0.013 58.071);
@@ -63,6 +67,8 @@
   --accent-foreground: oklch(0.216 0.006 56.043);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.923 0.003 48.717);
+  --border-custom: oklch(0.883 0.012 106.646);
+  --border-custom-light: oklch(0.9636 0.0027 106.449);
   --input: oklch(0.923 0.003 48.717);
   --ring: oklch(0.709 0.01 56.259);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -79,7 +85,11 @@
   --sidebar-border: oklch(0.923 0.003 48.717);
   --sidebar-ring: oklch(0.709 0.01 56.259);
   --background: oklch(1 0 0);
+  --background-custom: oklch(0.9843 0.004 106.4719);
   --foreground: oklch(0.147 0.004 49.25);
+  --foreground-custom: oklch(0.1776 0 0);
+  --main: oklch(0.304 0.04 213.681);
+  --off: oklch(0.502 0.008 106.677);
 }
 
 .dark {

@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
 import { Copy, Pencil, ThumbsDown, ThumbsUp, Trash } from "lucide-react"
-import { useRef } from "react"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
 import { Message, MessageAction, MessageActions, MessageContent } from "../ui/message"
@@ -11,10 +10,9 @@ import { ScrollButton } from "../ui/scroll-button"
 
 export default function ChatContent() {
     const chatMessages = useChatStore((state) => state.chatMessages)
-    const chatContainerRef = useRef<HTMLDivElement>(null)
 
     return (
-        <div ref={chatContainerRef} className="relative flex-1 overflow-y-auto">
+        <div className="relative overflow-y-auto">
             <ChatContainerRoot className="h-full">
                 <ChatContainerContent className="space-y-0 px-5 py-12">
                     {chatMessages.map((message, index) => {
@@ -32,7 +30,7 @@ export default function ChatContent() {
                                 {isAssistant ? (
                                     <div className="group flex w-full flex-col gap-0">
                                         <MessageContent
-                                            className="text-foreground prose flex-1 rounded-lg bg-transparent p-0"
+                                            className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
                                             markdown
                                         >
                                             {message.content}
@@ -74,7 +72,7 @@ export default function ChatContent() {
                                     </div>
                                 ) : (
                                     <div className="group flex flex-col items-end gap-1">
-                                        <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                                        <MessageContent className="bg-secondary-custom text-main/95 max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
                                             {message.content}
                                         </MessageContent>
                                         <MessageActions
@@ -117,7 +115,7 @@ export default function ChatContent() {
                     })}
                 </ChatContainerContent>
                 <div className="absolute bottom-4 left-1/2 flex w-full max-w-3xl -translate-x-1/2 justify-end px-5">
-                    <ScrollButton className="shadow-sm" />
+                    <ScrollButton className="border border-border-custom/75 shadow-none" />
                 </div>
             </ChatContainerRoot>
         </div>
