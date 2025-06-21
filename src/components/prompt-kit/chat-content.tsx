@@ -1,0 +1,125 @@
+"use client"
+
+import { cn } from "@/lib/utils"
+import { useChatStore } from "@/store/chat.store"
+import { Copy, Pencil, ThumbsDown, ThumbsUp, Trash } from "lucide-react"
+import { useRef } from "react"
+import { Button } from "../ui/button"
+import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
+import { Message, MessageAction, MessageActions, MessageContent } from "../ui/message"
+import { ScrollButton } from "../ui/scroll-button"
+
+export default function ChatContent() {
+    const chatMessages = useChatStore((state) => state.chatMessages)
+    const chatContainerRef = useRef<HTMLDivElement>(null)
+
+    return (
+        <div ref={chatContainerRef} className="relative flex-1 overflow-y-auto">
+            <ChatContainerRoot className="h-full">
+                <ChatContainerContent className="space-y-0 px-5 py-12">
+                    {chatMessages.map((message, index) => {
+                        const isAssistant = message.role === "assistant"
+                        const isLastMessage = index === chatMessages.length - 1
+
+                        return (
+                            <Message
+                                key={message.id}
+                                className={cn(
+                                    "mx-auto flex w-full max-w-3xl flex-col gap-2 px-6",
+                                    isAssistant ? "items-start" : "items-end"
+                                )}
+                            >
+                                {isAssistant ? (
+                                    <div className="group flex w-full flex-col gap-0">
+                                        <MessageContent
+                                            className="text-foreground prose flex-1 rounded-lg bg-transparent p-0"
+                                            markdown
+                                        >
+                                            {message.content}
+                                        </MessageContent>
+                                        <MessageActions
+                                            className={cn(
+                                                "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                                                isLastMessage && "opacity-100"
+                                            )}
+                                        >
+                                            <MessageAction tooltip="Copy" delayDuration={100}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full"
+                                                >
+                                                    <Copy />
+                                                </Button>
+                                            </MessageAction>
+                                            <MessageAction tooltip="Upvote" delayDuration={100}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full"
+                                                >
+                                                    <ThumbsUp />
+                                                </Button>
+                                            </MessageAction>
+                                            <MessageAction tooltip="Downvote" delayDuration={100}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full"
+                                                >
+                                                    <ThumbsDown />
+                                                </Button>
+                                            </MessageAction>
+                                        </MessageActions>
+                                    </div>
+                                ) : (
+                                    <div className="group flex flex-col items-end gap-1">
+                                        <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                                            {message.content}
+                                        </MessageContent>
+                                        <MessageActions
+                                            className={cn(
+                                                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                                            )}
+                                        >
+                                            <MessageAction tooltip="Edit" delayDuration={100}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full"
+                                                >
+                                                    <Pencil />
+                                                </Button>
+                                            </MessageAction>
+                                            <MessageAction tooltip="Delete" delayDuration={100}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full"
+                                                >
+                                                    <Trash />
+                                                </Button>
+                                            </MessageAction>
+                                            <MessageAction tooltip="Copy" delayDuration={100}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full"
+                                                >
+                                                    <Copy />
+                                                </Button>
+                                            </MessageAction>
+                                        </MessageActions>
+                                    </div>
+                                )}
+                            </Message>
+                        )
+                    })}
+                </ChatContainerContent>
+                <div className="absolute bottom-4 left-1/2 flex w-full max-w-3xl -translate-x-1/2 justify-end px-5">
+                    <ScrollButton className="shadow-sm" />
+                </div>
+            </ChatContainerRoot>
+        </div>
+    )
+}

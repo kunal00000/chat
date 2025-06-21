@@ -1,54 +1,14 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import {
-    PromptInput,
-    PromptInputAction,
-    PromptInputActions,
-    PromptInputTextarea,
-} from "@/components/ui/prompt-input"
+import { PromptBarInput } from "@/components/ui/prompt-bar-input"
 import { PromptSuggestion } from "@/components/ui/prompt-suggestion"
 import { useChatStore } from "@/store/chat.store"
-import { motion } from "framer-motion"
-import { ArrowUp, BrainIcon, Mic } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { BrainIcon } from "lucide-react"
 import { useState } from "react"
 
 export function PromptInputWithSuggestions() {
     const [activeCategory, setActiveCategory] = useState("")
-    const nextRouter = useRouter()
-    const { suggestionGroups, prompt, isPromptBarLoading } = useChatStore((state) => ({
-        suggestionGroups: state.suggestionGroups,
-        prompt: state.prompt,
-        isPromptBarLoading: state.isPromptBarLoading,
-    }))
-
-    const handleSubmit = () => {
-        if (!prompt.trim()) return
-
-        nextRouter.push("/chat/123")
-
-        useChatStore.setState({
-            isPromptBarLoading: true,
-        })
-
-        // Simulate API call
-        console.log("Processing:", prompt)
-        setTimeout(() => {
-            useChatStore.setState({
-                prompt: "",
-                isPromptBarLoading: false,
-            })
-            setActiveCategory("")
-        }, 1500)
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSubmit()
-        }
-    }
+    const suggestionGroups = useChatStore((state) => state.suggestionGroups)
 
     const handlePromptInputValueChange = (value: string) => {
         useChatStore.setState({
@@ -69,47 +29,14 @@ export function PromptInputWithSuggestions() {
     const showCategorySuggestions = activeCategory !== ""
 
     return (
-        <motion.div
-            layout
-            layoutId={"prompt-bar"}
+        <div
             className="absolute inset-x-0 top-1/2 mx-auto flex max-w-3xl -translate-y-1/2 flex-col items-center justify-center gap-4 px-3 pb-3 md:px-5 md:pb-5">
-            <PromptInput
-                className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
-                value={prompt}
+            <PromptBarInput
+                className="w-full"
+                placeholder="Ask anything..."
                 onValueChange={handlePromptInputValueChange}
-                onSubmit={handleSubmit}
-            >
-                <PromptInputTextarea
-                    placeholder="Ask anything..."
-                    className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
-                    onKeyDown={handleKeyDown}
-                />
-
-                <PromptInputActions className="mt-5 flex w-full items-end justify-end gap-2 px-3 pb-3">
-                    <PromptInputAction tooltip="Voice input">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-9 shadow-none rounded-full"
-                        >
-                            <Mic size={18} />
-                        </Button>
-                    </PromptInputAction>
-
-                    <Button
-                        size="icon"
-                        disabled={!prompt.trim() || isPromptBarLoading}
-                        onClick={handleSubmit}
-                        className="size-9 rounded-full"
-                    >
-                        {!isPromptBarLoading ? (
-                            <ArrowUp size={18} />
-                        ) : (
-                            <span className="size-3 rounded-xs bg-white" />
-                        )}
-                    </Button>
-                </PromptInputActions>
-            </PromptInput>
+                navigateToChat={true}
+            />
 
             <div className="relative flex w-full flex-col items-center justify-center space-y-2">
                 <div className="absolute top-0 left-0 h-[70px] w-full">
@@ -153,6 +80,6 @@ export function PromptInputWithSuggestions() {
                     )}
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 }

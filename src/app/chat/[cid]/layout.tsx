@@ -1,4 +1,4 @@
-import { ChatSidebar } from '@/components/prompt-kit/full-app'
+import { ChatSidebar } from '@/components/prompt-kit/chat-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import React from 'react'
 
