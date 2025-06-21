@@ -10,7 +10,7 @@ export default function ChatLayout({
     return (
         <SidebarProvider>
             <ChatSidebar />
-            <SidebarInset>
+            <SidebarInset className='bg-border-custom/50'>
                 {children}
             </SidebarInset>
         </SidebarProvider>

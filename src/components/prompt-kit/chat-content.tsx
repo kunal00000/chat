@@ -12,9 +12,9 @@ export default function ChatContent() {
     const chatMessages = useChatStore((state) => state.chatMessages)
 
     return (
-        <div className="relative overflow-y-auto">
+        <div className="relative flex-1 overflow-y-auto">
             <ChatContainerRoot className="h-full">
-                <ChatContainerContent className="space-y-0 px-5 py-12">
+                <ChatContainerContent className="space-y-0 px-5 pt-20 pb-12">
                     {chatMessages.map((message, index) => {
                         const isAssistant = message.role === "assistant"
                         const isLastMessage = index === chatMessages.length - 1

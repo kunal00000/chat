@@ -1,14 +1,15 @@
 import ChatContent from "@/components/prompt-kit/chat-content";
 import { PromptBarInput } from "@/components/ui/prompt-bar-input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 export default async function ChatPage({ params }: { params: Promise<{ cid: string }> }) {
     const { cid } = await params;
     console.log({ cid });
 
     return (
-        <main className="flex h-screen flex-col overflow-hidden bg-background-custom">
-            <header className="z-10 flex h-16 w-full shrink-0 items-center gap-2 border-b px-4 border-border-custom/50">
+        <main className="relative flex h-screen rounded-tl-md ml-2 mt-2 flex-col overflow-hidden bg-background-custom">
+            <header className={cn("absolute top-0 z-10 flex h-14 w-full items-center gap-2 px-4", "border-b border-border-custom/50 backdrop-blur-xl")}>
                 <SidebarTrigger className="-ml-1" />
                 <div className="text-foreground">Project roadmap discussion</div>
             </header>
