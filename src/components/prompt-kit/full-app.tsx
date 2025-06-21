@@ -31,6 +31,8 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
+import { useChatStore } from "@/store/chat.store"
+import { motion } from "framer-motion"
 import {
     ArrowUp,
     Copy,
@@ -45,121 +47,11 @@ import {
     ThumbsUp,
     Trash,
 } from "lucide-react"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
-// Initial conversation history
-const conversationHistory = [
-    {
-        period: "Today",
-        conversations: [
-            {
-                id: "t1",
-                title: "Project roadmap discussion",
-                lastMessage:
-                    "Let's prioritize the authentication features for the next sprint.",
-                timestamp: new Date().setHours(new Date().getHours() - 2),
-            },
-            {
-                id: "t2",
-                title: "API Documentation Review",
-                lastMessage:
-                    "The endpoint descriptions need more detail about rate limiting.",
-                timestamp: new Date().setHours(new Date().getHours() - 5),
-            },
-            {
-                id: "t3",
-                title: "Frontend Bug Analysis",
-                lastMessage:
-                    "I found the issue - we need to handle the null state in the user profile component.",
-                timestamp: new Date().setHours(new Date().getHours() - 8),
-            },
-        ],
-    },
-    {
-        period: "Yesterday",
-        conversations: [
-            {
-                id: "y1",
-                title: "Database Schema Design",
-                lastMessage:
-                    "Let's add indexes to improve query performance on these tables.",
-                timestamp: new Date().setDate(new Date().getDate() - 1),
-            },
-            {
-                id: "y2",
-                title: "Performance Optimization",
-                lastMessage:
-                    "The lazy loading implementation reduced initial load time by 40%.",
-                timestamp: new Date().setDate(new Date().getDate() - 1),
-            },
-        ],
-    },
-    {
-        period: "Last 7 days",
-        conversations: [
-            {
-                id: "w1",
-                title: "Authentication Flow",
-                lastMessage: "We should implement the OAuth2 flow with refresh tokens.",
-                timestamp: new Date().setDate(new Date().getDate() - 3),
-            },
-            {
-                id: "w2",
-                title: "Component Library",
-                lastMessage:
-                    "These new UI components follow the design system guidelines perfectly.",
-                timestamp: new Date().setDate(new Date().getDate() - 5),
-            },
-            {
-                id: "w3",
-                title: "UI/UX Feedback",
-                lastMessage:
-                    "The navigation redesign received positive feedback from the test group.",
-                timestamp: new Date().setDate(new Date().getDate() - 6),
-            },
-        ],
-    },
-    {
-        period: "Last month",
-        conversations: [
-            {
-                id: "m1",
-                title: "Initial Project Setup",
-                lastMessage:
-                    "All the development environments are now configured consistently.",
-                timestamp: new Date().setDate(new Date().getDate() - 15),
-            },
-        ],
-    },
-]
+export function ChatSidebar() {
+    const conversationHistory = useChatStore((state) => state.conversationHistory)
 
-// Initial chat messages
-const initialMessages = [
-    {
-        id: 1,
-        role: "user",
-        content: "Hello! Can you help me with a coding question?",
-    },
-    {
-        id: 2,
-        role: "assistant",
-        content:
-            "Of course! I'd be happy to help with your coding question. What would you like to know?",
-    },
-    {
-        id: 3,
-        role: "user",
-        content: "How do I create a responsive layout with CSS Grid?",
-    },
-    {
-        id: 4,
-        role: "assistant",
-        content:
-            "Creating a responsive layout with CSS Grid is straightforward. Here's a basic example:\n\n```css\n.container {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n  gap: 1rem;\n}\n```\n\nThis creates a grid where:\n- Columns automatically fit as many as possible\n- Each column is at least 250px wide\n- Columns expand to fill available space\n- There's a 1rem gap between items\n\nWould you like me to explain more about how this works?",
-    },
-]
-
-function ChatSidebar() {
     return (
         <Sidebar>
             <SidebarHeader className="flex flex-row items-center justify-between gap-2 px-2 py-4">
@@ -200,37 +92,52 @@ function ChatSidebar() {
     )
 }
 
-function ChatContent() {
-    const [prompt, setPrompt] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
-    const [chatMessages, setChatMessages] = useState(initialMessages)
+function handlePromptInputValueChange(value: string) {
+    useChatStore.setState({
+        prompt: value,
+    })
+}
+
+export function ChatContent() {
+    const { prompt, isPromptBarLoading, chatMessages } = useChatStore((state) => ({
+        prompt: state.prompt,
+        isPromptBarLoading: state.isPromptBarLoading,
+        chatMessages: state.chatMessages,
+    }))
+
     const chatContainerRef = useRef<HTMLDivElement>(null)
 
     const handleSubmit = () => {
         if (!prompt.trim()) return
 
-        setPrompt("")
-        setIsLoading(true)
+        useChatStore.setState({
+            prompt: "",
+            isPromptBarLoading: true,
+        })
 
         // Add user message immediately
         const newUserMessage = {
             id: chatMessages.length + 1,
-            role: "user",
+            role: "user" as const,
             content: prompt.trim(),
         }
 
-        setChatMessages([...chatMessages, newUserMessage])
+        useChatStore.setState({
+            chatMessages: [...chatMessages, newUserMessage],
+        })
 
         // Simulate API response
         setTimeout(() => {
             const assistantResponse = {
                 id: chatMessages.length + 2,
-                role: "assistant",
+                role: "assistant" as const,
                 content: `This is a response to: "${prompt.trim()}"`,
             }
 
-            setChatMessages((prev) => [...prev, assistantResponse])
-            setIsLoading(false)
+            useChatStore.setState({
+                chatMessages: [...chatMessages, newUserMessage, assistantResponse],
+                isPromptBarLoading: false,
+            })
         }, 1500)
     }
 
@@ -350,11 +257,14 @@ function ChatContent() {
             </div>
 
             <div className="bg-background z-10 shrink-0 px-3 pb-3 md:px-5 md:pb-5">
-                <div className="mx-auto max-w-3xl">
+                <motion.div
+                    layout
+                    layoutId={"prompt-bar"}
+                    className="mx-auto max-w-3xl">
                     <PromptInput
-                        isLoading={isLoading}
+                        isLoading={isPromptBarLoading}
                         value={prompt}
-                        onValueChange={setPrompt}
+                        onValueChange={handlePromptInputValueChange}
                         onSubmit={handleSubmit}
                         className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
                     >
@@ -406,11 +316,11 @@ function ChatContent() {
 
                                     <Button
                                         size="icon"
-                                        disabled={!prompt.trim() || isLoading}
+                                        disabled={!prompt.trim() || isPromptBarLoading}
                                         onClick={handleSubmit}
                                         className="size-9 rounded-full"
                                     >
-                                        {!isLoading ? (
+                                        {!isPromptBarLoading ? (
                                             <ArrowUp size={18} />
                                         ) : (
                                             <span className="size-3 rounded-xs bg-white" />
@@ -420,7 +330,7 @@ function ChatContent() {
                             </PromptInputActions>
                         </div>
                     </PromptInput>
-                </div>
+                </motion.div>
             </div>
         </main>
     )

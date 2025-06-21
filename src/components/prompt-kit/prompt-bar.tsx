@@ -8,67 +8,37 @@ import {
     PromptInputTextarea,
 } from "@/components/ui/prompt-input"
 import { PromptSuggestion } from "@/components/ui/prompt-suggestion"
+import { useChatStore } from "@/store/chat.store"
+import { motion } from "framer-motion"
 import { ArrowUp, BrainIcon, Mic } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-const suggestionGroups = [
-    {
-        label: "Summary",
-        highlight: "Summarize",
-        items: [
-            "Summarize a document",
-            "Summarize a video",
-            "Summarize a podcast",
-            "Summarize a book",
-        ],
-    },
-    {
-        label: "Code",
-        highlight: "Help me",
-        items: [
-            "Help me write React components",
-            "Help me debug code",
-            "Help me learn Python",
-            "Help me learn SQL",
-        ],
-    },
-    {
-        label: "Design",
-        highlight: "Design",
-        items: [
-            "Design a small logo",
-            "Design a hero section",
-            "Design a landing page",
-            "Design a social media post",
-        ],
-    },
-    {
-        label: "Research",
-        highlight: "Research",
-        items: [
-            "Research the best practices for SEO",
-            "Research the best running shoes",
-            "Research the best restaurants in Paris",
-            "Research the best AI tools",
-        ],
-    },
-]
-
 export function PromptInputWithSuggestions() {
-    const [inputValue, setInputValue] = useState("")
     const [activeCategory, setActiveCategory] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
+    const nextRouter = useRouter()
+    const { suggestionGroups, prompt, isPromptBarLoading } = useChatStore((state) => ({
+        suggestionGroups: state.suggestionGroups,
+        prompt: state.prompt,
+        isPromptBarLoading: state.isPromptBarLoading,
+    }))
 
     const handleSubmit = () => {
-        if (!inputValue.trim()) return
+        if (!prompt.trim()) return
 
-        setIsLoading(true)
+        nextRouter.push("/chat/123")
+
+        useChatStore.setState({
+            isPromptBarLoading: true,
+        })
 
         // Simulate API call
-        console.log("Processing:", inputValue)
+        console.log("Processing:", prompt)
         setTimeout(() => {
-            setInputValue("")
-            setIsLoading(false)
+            useChatStore.setState({
+                prompt: "",
+                isPromptBarLoading: false,
+            })
             setActiveCategory("")
         }, 1500)
     }
@@ -81,7 +51,9 @@ export function PromptInputWithSuggestions() {
     }
 
     const handlePromptInputValueChange = (value: string) => {
-        setInputValue(value)
+        useChatStore.setState({
+            prompt: value,
+        })
         // Clear active category when typing something different
         if (value.trim() === "") {
             setActiveCategory("")
@@ -97,10 +69,13 @@ export function PromptInputWithSuggestions() {
     const showCategorySuggestions = activeCategory !== ""
 
     return (
-        <div className="absolute inset-x-0 top-1/2 mx-auto flex max-w-3xl -translate-y-1/2 flex-col items-center justify-center gap-4 px-3 pb-3 md:px-5 md:pb-5">
+        <motion.div
+            layout
+            layoutId={"prompt-bar"}
+            className="absolute inset-x-0 top-1/2 mx-auto flex max-w-3xl -translate-y-1/2 flex-col items-center justify-center gap-4 px-3 pb-3 md:px-5 md:pb-5">
             <PromptInput
                 className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
-                value={inputValue}
+                value={prompt}
                 onValueChange={handlePromptInputValueChange}
                 onSubmit={handleSubmit}
             >
@@ -123,11 +98,11 @@ export function PromptInputWithSuggestions() {
 
                     <Button
                         size="icon"
-                        disabled={!inputValue.trim() || isLoading}
+                        disabled={!prompt.trim() || isPromptBarLoading}
                         onClick={handleSubmit}
                         className="size-9 rounded-full"
                     >
-                        {!isLoading ? (
+                        {!isPromptBarLoading ? (
                             <ArrowUp size={18} />
                         ) : (
                             <span className="size-3 rounded-xs bg-white" />
@@ -145,7 +120,9 @@ export function PromptInputWithSuggestions() {
                                     key={suggestion}
                                     highlight={activeCategoryData.highlight}
                                     onClick={() => {
-                                        setInputValue(suggestion)
+                                        useChatStore.setState({
+                                            prompt: suggestion,
+                                        })
                                         // Optional: auto-send
                                         // handleSend()
                                     }}
@@ -161,7 +138,9 @@ export function PromptInputWithSuggestions() {
                                     key={suggestion.label}
                                     onClick={() => {
                                         setActiveCategory(suggestion.label)
-                                        setInputValue("") // Clear input when selecting a category
+                                        useChatStore.setState({
+                                            prompt: "",
+                                        }) // Clear input when selecting a category
                                     }}
                                     className="capitalize bg-secondary rounded-lg shadow-none"
                                     size={"default"}
@@ -174,6 +153,6 @@ export function PromptInputWithSuggestions() {
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     )
 }
