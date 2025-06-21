@@ -74,7 +74,6 @@ export function PromptBarInput({
             useChatStore.setState({
                 chatMessages: [...chatMessages, newUserMessage],
             })
-            console.log("Processing:", prompt)
 
             // Simulate API response
             setTimeout(() => {
