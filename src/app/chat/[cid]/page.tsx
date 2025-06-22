@@ -8,7 +8,7 @@ export default async function ChatPage({ params }: { params: Promise<{ cid: stri
     console.log({ cid });
 
     return (
-        <main className="relative flex h-screen rounded-tl-md ml-2 mt-2 flex-col overflow-hidden bg-background-custom">
+        <main className="relative flex h-screen md:rounded-tl-md md:ml-2 md:mt-2 flex-col overflow-hidden bg-background-custom">
             <header className={cn("absolute top-0 z-10 flex h-14 w-full items-center gap-2 px-4", "border-b border-border-custom/50 backdrop-blur-xl")}>
                 <SidebarTrigger className="-ml-1" />
                 <div className="text-foreground">Project roadmap discussion</div>
