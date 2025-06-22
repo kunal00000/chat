@@ -7,13 +7,16 @@ import {
     PromptInputActions,
     PromptInputTextarea,
 } from "@/components/ui/prompt-input"
+import { SUGGESTION_GROUPS } from "@/constants/prompt-kit.constants"
+import { CH, CHAT_ARGS } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
-import { useChatStore } from "@/store/chat.store"
+import { useChat } from "@ai-sdk/react"
 import { motion } from "framer-motion"
-import { ArrowUp, Mic } from "lucide-react"
+import { ArrowUp, BrainIcon, Mic } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { ReactNode } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { toast } from "sonner"
+import { PromptSuggestion } from "./prompt-suggestion"
 
 interface PromptBarInputProps {
     className?: string
@@ -21,10 +24,8 @@ interface PromptBarInputProps {
     showVoiceButton?: boolean
     showAdditionalActions?: boolean
     additionalActions?: ReactNode
-    onSubmit?: () => void
-    onValueChange?: (value: string) => void
-    layoutId?: string
     navigateToChat?: boolean
+    showSuggestions?: boolean
 }
 
 export function PromptBarInput({
@@ -33,20 +34,14 @@ export function PromptBarInput({
     showVoiceButton = true,
     showAdditionalActions = false,
     additionalActions,
-    onSubmit: customOnSubmit,
-    onValueChange: customOnValueChange,
-    layoutId = "prompt-bar",
     navigateToChat = false,
+    showSuggestions = false,
 }: PromptBarInputProps) {
     const nextRouter = useRouter()
-    const { prompt, isPromptBarLoading, chatMessages } = useChatStore((state) => ({
-        prompt: state.prompt,
-        isPromptBarLoading: state.isPromptBarLoading,
-        chatMessages: state.chatMessages
-    }))
+    const { input, setInput, status, append, handleInputChange } = useChat(CHAT_ARGS)
 
-    const handleSubmit = () => {
-        if (!prompt.trim()) {
+    const handleSubmitWrapper = () => {
+        if (!input.trim()) {
             toast.error("Please enter a prompt")
             return
         }
@@ -55,70 +50,35 @@ export function PromptBarInput({
             nextRouter.push("/chat/123")
         }
 
-        useChatStore.setState({
-            prompt: "",
-            isPromptBarLoading: true,
+        setInput("")
+
+        append({
+            role: "user",
+            content: input.trim(),
         })
-
-        // Call custom onSubmit if provided
-        if (customOnSubmit) {
-            customOnSubmit()
-        } else {
-
-            const newUserMessage = {
-                id: chatMessages.length + 1,
-                role: "user" as const,
-                content: prompt.trim(),
-            }
-
-            useChatStore.setState({
-                chatMessages: [...chatMessages, newUserMessage],
-            })
-
-            // Simulate API response
-            setTimeout(() => {
-                const assistantResponse = {
-                    id: chatMessages.length + 2,
-                    role: "assistant" as const,
-                    content: `This is a response to: "${prompt.trim()}"`,
-                }
-
-                useChatStore.setState({
-                    chatMessages: [...chatMessages, newUserMessage, assistantResponse],
-                    isPromptBarLoading: false,
-                })
-            }, 1500)
-        }
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault()
-            handleSubmit()
+            handleSubmitWrapper()
         }
     }
 
-    const handlePromptInputValueChange = (value: string) => {
-        if (customOnValueChange) {
-            customOnValueChange(value)
-        } else {
-            useChatStore.setState({
-                prompt: value,
-            })
-        }
-    }
 
     return (
         <motion.div
             layout
-            layoutId={layoutId}
-            className={className}
+            layoutId={"prompt-bar"}
+            className={cn("relative space-y-4", className)}
         >
             <PromptInput
-                isLoading={isPromptBarLoading}
-                value={prompt}
-                onValueChange={handlePromptInputValueChange}
-                onSubmit={handleSubmit}
+                isLoading={CH.isPromptBarLoading(status)}
+                value={input}
+                onValueChange={(value) => {
+                    handleInputChange({ target: { value } } as React.ChangeEvent<HTMLTextAreaElement>)
+                }}
+                onSubmit={handleSubmitWrapper}
                 className={cn("border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs", className)}
             >
                 <div className="flex flex-col">
@@ -149,11 +109,11 @@ export function PromptBarInput({
 
                             <Button
                                 size="icon"
-                                disabled={!prompt.trim() || isPromptBarLoading}
-                                onClick={handleSubmit}
+                                disabled={!input.trim() || CH.isPromptBarLoading(status)}
+                                onClick={handleSubmitWrapper}
                                 className="size-9 rounded-full"
                             >
-                                {!isPromptBarLoading ? (
+                                {!CH.isPromptBarLoading(status) ? (
                                     <ArrowUp size={18} />
                                 ) : (
                                     <span className="size-3 rounded-xs bg-white" />
@@ -163,6 +123,65 @@ export function PromptBarInput({
                     </PromptInputActions>
                 </div>
             </PromptInput>
+
+            {showSuggestions && (
+                <PromptBarSuggestions input={input} setInput={setInput} />
+            )}
         </motion.div>
     )
-} 
+}
+
+function PromptBarSuggestions({ input, setInput }: { input: string, setInput: (input: string) => void }) {
+    const [activeCategory, setActiveCategory] = useState("")
+    const showCategorySuggestions = activeCategory !== ""
+    const activeCategoryData = SUGGESTION_GROUPS.find(
+        (group) => group.label === activeCategory
+    )
+
+    useEffect(() => {
+        if (input.trim() === "") {
+            setActiveCategory("")
+        }
+    }, [input, setActiveCategory])
+
+    return (
+        <div className="relative flex w-full flex-col items-center justify-center space-y-2">
+            <div className="absolute top-0 left-0 h-[70px] w-full">
+                {showCategorySuggestions ? (
+                    <div className="flex w-full flex-col space-y-1">
+                        {activeCategoryData?.items.map((suggestion) => (
+                            <PromptSuggestion
+                                key={suggestion}
+                                highlight={activeCategoryData.highlight}
+                                onClick={() => { setInput(suggestion) }}
+                            >
+                                {suggestion}
+                            </PromptSuggestion>
+                        ))}
+                    </div>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.45 }}
+                        className="relative flex w-full flex-wrap items-stretch justify-start gap-2">
+                        {SUGGESTION_GROUPS.map((suggestion) => (
+                            <PromptSuggestion
+                                key={suggestion.label}
+                                onClick={() => {
+                                    setActiveCategory(suggestion.label)
+                                    setInput(suggestion.label)
+                                }}
+                                className="capitalize bg-secondary rounded-lg shadow-none"
+                                size={"default"}
+                            >
+                                <BrainIcon className="h-4 w-4" />
+                                {suggestion.label}
+                            </PromptSuggestion>
+                        ))}
+                    </motion.div>
+                )}
+            </div>
+        </div>
+    )
+}
