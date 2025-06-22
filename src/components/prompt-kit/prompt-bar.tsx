@@ -3,6 +3,7 @@
 import { PromptBarInput } from "@/components/ui/prompt-bar-input"
 import { PromptSuggestion } from "@/components/ui/prompt-suggestion"
 import { useChatStore } from "@/store/chat.store"
+import { motion } from "framer-motion"
 import { BrainIcon } from "lucide-react"
 import { useState } from "react"
 
@@ -59,7 +60,11 @@ export function PromptInputWithSuggestions() {
                             ))}
                         </div>
                     ) : (
-                        <div className="relative flex w-full flex-wrap items-stretch justify-start gap-2">
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            transition={{ duration: 0.45 }}
+                            className="relative flex w-full flex-wrap items-stretch justify-start gap-2">
                             {suggestionGroups.map((suggestion) => (
                                 <PromptSuggestion
                                     key={suggestion.label}
@@ -76,7 +81,7 @@ export function PromptInputWithSuggestions() {
                                     {suggestion.label}
                                 </PromptSuggestion>
                             ))}
-                        </div>
+                        </motion.div>
                     )}
                 </div>
             </div>
