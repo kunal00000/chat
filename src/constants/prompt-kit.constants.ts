@@ -87,23 +87,23 @@ export const CONVERSATION_HISTORY = [
 // Initial chat messages
 export const INITIAL_MESSAGES = [
   {
-    id: 1,
+    id: "m_1",
     role: "user" as const,
     content: "Hello! Can you help me with a coding question?",
   },
   {
-    id: 2,
+    id: "m_2",
     role: "assistant" as const,
     content:
       "Of course! I'd be happy to help with your coding question. What would you like to know?",
   },
   {
-    id: 3,
+    id: "m_3",
     role: "user" as const,
     content: "How do I create a responsive layout with CSS Grid?",
   },
   {
-    id: 4,
+    id: "m_4",
     role: "assistant" as const,
     content:
       "Creating a responsive layout with CSS Grid is straightforward. Here's a basic example:\n\n```css\n.container {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n  gap: 1rem;\n}\n```\n\nThis creates a grid where:\n- Columns automatically fit as many as possible\n- Each column is at least 250px wide\n- Columns expand to fill available space\n- There's a 1rem gap between items\n\nWould you like me to explain more about how this works?",

@@ -10,15 +10,13 @@ import {
     SidebarMenu,
     SidebarMenuButton
 } from "@/components/ui/sidebar"
-import { useChatStore } from "@/store/chat.store"
+import { CONVERSATION_HISTORY } from "@/constants/prompt-kit.constants"
 import {
     PlusIcon,
     Search
 } from "lucide-react"
 
 export function ChatSidebar() {
-    const conversationHistory = useChatStore((state) => state.conversationHistory)
-
     return (
         <Sidebar className="border-none">
             <SidebarHeader className="flex flex-row items-center justify-between gap-2 px-2 py-4 bg-border-custom/50">
@@ -42,7 +40,7 @@ export function ChatSidebar() {
                         <span>New Chat</span>
                     </Button>
                 </div>
-                {conversationHistory.map((group) => (
+                {CONVERSATION_HISTORY.map((group) => (
                     <SidebarGroup key={group.period}>
                         <SidebarGroupLabel>{group.period}</SidebarGroupLabel>
                         <SidebarMenu>

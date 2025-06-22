@@ -1,7 +1,7 @@
 "use client"
 
+import { INITIAL_MESSAGES } from "@/constants/prompt-kit.constants"
 import { cn } from "@/lib/utils"
-import { useChatStore } from "@/store/chat.store"
 import { Copy, Pencil, ThumbsDown, ThumbsUp, Trash } from "lucide-react"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
@@ -9,15 +9,13 @@ import { Message, MessageAction, MessageActions, MessageContent } from "../ui/me
 import { ScrollButton } from "../ui/scroll-button"
 
 export default function ChatContent() {
-    const chatMessages = useChatStore((state) => state.chatMessages)
-
     return (
         <div className="relative flex-1 overflow-y-auto">
             <ChatContainerRoot className="h-full">
                 <ChatContainerContent className="space-y-0 px-5 pt-20 pb-12">
-                    {chatMessages.map((message, index) => {
+                    {INITIAL_MESSAGES.map((message, index) => {
                         const isAssistant = message.role === "assistant"
-                        const isLastMessage = index === chatMessages.length - 1
+                        const isLastMessage = index === INITIAL_MESSAGES.length - 1
 
                         return (
                             <Message
