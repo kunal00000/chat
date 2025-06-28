@@ -1,12 +1,12 @@
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
 import { cn } from "@/lib/utils"
-import { CheckIcon, CopyIcon } from "lucide-react"
 import { marked } from "marked"
-import React, { memo, useId, useMemo } from "react"
+import { memo, useId, useMemo } from "react"
 import ReactMarkdown, { Components } from "react-markdown"
 import remarkBreaks from "remark-breaks"
 import remarkGfm from "remark-gfm"
 import { Button } from "./button"
-import { CodeBlock, CodeBlockCode } from "./code-block"
+import { CodeBlock, CodeBlockCode, CodeBlockGroup } from "./code-block"
 
 export type MarkdownProps = {
     children: string
@@ -32,14 +32,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
             !props.node?.position?.start.line ||
             props.node?.position?.start.line === props.node?.position?.end.line
 
-        // Copy button state and handler
-        const [copied, setCopied] = React.useState(false)
-        const codeString = Array.isArray(children) ? children.join("") : String(children)
-        const handleCopy = async () => {
-            await navigator.clipboard.writeText(codeString)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1200)
-        }
+        const { handleCopy, getCopyIcon, getCopyText } = useCopyToClipboard()
 
         if (isInline) {
             return (
@@ -56,21 +49,29 @@ const INITIAL_COMPONENTS: Partial<Components> = {
         }
 
         const language = extractLanguage(className)
+        const copyId = `${language}-${children?.toString().slice(0, 10)}`
 
         return (
-            <div className="relative">
-                <Button
-                    variant={"ghost"}
-                    onClick={handleCopy}
-                    className="absolute top-2 right-2 flex items-center gap-1 text-xs font-medium shadow-none text-muted-foreground hover:bg-transparent"
-                >
-                    {copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
-                    {copied ? "Copied" : "Copy"}
-                </Button>
-                <CodeBlock className={className}>
-                    <CodeBlockCode code={codeString} language={language} />
-                </CodeBlock>
-            </div>
+            <CodeBlock className={className}>
+                <CodeBlockGroup className="flex h-9 items-center justify-between px-4">
+                    <div className="text-muted-foreground py-1 pr-2 font-mono text-xs">
+                        {language}
+                    </div>
+                </CodeBlockGroup>
+                <div className="sticky top-16 lg:top-0">
+                    <div className="absolute right-0 bottom-0 flex h-9 items-center pr-1.5">
+                        <Button
+                            variant={"ghost"}
+                            onClick={() => handleCopy(copyId, children as string)}
+                            className="flex items-center gap-1 text-xs font-medium shadow-none text-muted-foreground hover:bg-transparent"
+                        >
+                            {getCopyIcon(copyId, "size-3")}
+                            {getCopyText(copyId)}
+                        </Button>
+                    </div>
+                </div>
+                <CodeBlockCode code={children as string} language={language} />
+            </CodeBlock>
         )
     },
     pre: function PreComponent({ children }) {

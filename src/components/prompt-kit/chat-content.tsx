@@ -1,6 +1,6 @@
 "use client"
 
-import { useCopyMessage } from "@/hooks/use-copy-message"
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
 import { shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
@@ -16,7 +16,7 @@ export default function ChatContent() {
         streamingMessage: s.streamingMessage,
     }))
 
-    const { handleCopy, getCopyIcon } = useCopyMessage();
+    const { handleCopy, getCopyIcon } = useCopyToClipboard();
 
     return (
         <div className="relative flex-1 overflow-y-auto">
@@ -53,7 +53,7 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
-                                                    onClick={() => handleCopy(message)}
+                                                    onClick={() => handleCopy(message.id, message.content)}
                                                 >
                                                     {getCopyIcon(message.id)}
                                                 </Button>
@@ -95,7 +95,7 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
-                                                    onClick={() => handleCopy(message)}
+                                                    onClick={() => handleCopy(message.id, message.content)}
                                                 >
                                                     {getCopyIcon(message.id)}
                                                 </Button>
