@@ -31,7 +31,7 @@ interface PromptBarInputProps {
 export function PromptBarInput({
     className = "",
     placeholder = "Ask anything...",
-    showVoiceButton = true,
+    showVoiceButton = false,
     showAdditionalActions = false,
     additionalActions,
     navigateToChat = false,
