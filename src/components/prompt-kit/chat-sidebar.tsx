@@ -15,8 +15,11 @@ import {
     PlusIcon,
     Search
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function ChatSidebar() {
+    const nextRouter = useRouter()
+
     return (
         <Sidebar className="border-none">
             <SidebarHeader className="flex flex-row items-center justify-between gap-2 px-2 py-4 bg-border-custom/50">
@@ -35,6 +38,7 @@ export function ChatSidebar() {
                     <Button
                         variant="outline"
                         className="mb-4 flex w-full items-center gap-2"
+                        onClick={() => nextRouter.push("/")}
                     >
                         <PlusIcon className="size-4" />
                         <span>New Chat</span>

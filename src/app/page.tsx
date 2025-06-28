@@ -1,6 +1,14 @@
+"use client"
+
 import { PromptBarInput } from "@/components/ui/prompt-bar-input";
+import { useChatStore } from "@/store/chat.store";
+import { useEffect } from "react";
 
 export default function Home() {
+    useEffect(() => {
+        useChatStore.setState({ chatId: null })
+    }, [])
+
     return (
         <main className="bg-border-custom/50 h-screen w-full md:pt-2 md:pl-2">
             <div className="bg-background-custom md:rounded-tl-md h-full w-full relative">
