@@ -25,8 +25,8 @@ export function ChatSidebar() {
             <SidebarHeader className="flex flex-row items-center justify-between gap-2 px-2 py-4 bg-border-custom/50">
                 <div className="flex flex-row items-center gap-2 px-2">
                     <div className="bg-primary/10 size-8 rounded-md"></div>
-                    <div className="text-md font-base text-primary tracking-tight">
-                        chat
+                    <div className="text-md font-medium text-primary tracking-tight">
+                        vukchat
                     </div>
                 </div>
                 <Button variant="ghost" className="size-8">
@@ -37,7 +37,7 @@ export function ChatSidebar() {
                 <div className="px-4">
                     <Button
                         variant="outline"
-                        className="mb-4 flex w-full items-center gap-2"
+                        className="mb-4 flex w-full items-center gap-2 border-none shadow-none bg-background-custom hover:bg-background-custom"
                         onClick={() => nextRouter.push("/")}
                     >
                         <PlusIcon className="size-4" />
