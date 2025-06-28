@@ -1,10 +1,9 @@
+import { TSSEStatus } from "@/store/sse.helpers";
 import { UseChatOptions } from "@ai-sdk/react";
 
 export const CH = {
-  isPromptBarLoading: (
-    status: "submitted" | "streaming" | "ready" | "error"
-  ) => {
-    return status === "submitted" || status === "streaming";
+  isPromptBarLoading: (status: TSSEStatus) => {
+    return status !== "error" && status !== "idle" && status !== "success";
   },
 };
 
@@ -21,3 +20,7 @@ export const CHAT_ARGS: UseChatOptions = {
     console.log("ON ERROR", args);
   },
 };
+
+export function getMessageId(role: "user" | "assistant") {
+  return `${role}-msg-${Date.now()}${Math.random()}`;
+}

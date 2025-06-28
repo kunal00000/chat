@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { useChat } from "@ai-sdk/react"
+import { useChatStore } from "@/store/chat.store"
 import { Copy, Pencil, ThumbsDown, ThumbsUp, Trash } from "lucide-react"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
@@ -9,7 +9,10 @@ import { Message, MessageAction, MessageActions, MessageContent } from "../ui/me
 import { ScrollButton } from "../ui/scroll-button"
 
 export default function ChatContent() {
-    const { messages: chatMessages } = useChat({ id: "123" })
+    const { chatMessages, streamingMessage } = useChatStore((s) => ({
+        chatMessages: s.messages,
+        streamingMessage: s.streamingMessage,
+    }))
 
     return (
         <div className="relative flex-1 overflow-y-auto">
@@ -113,6 +116,21 @@ export default function ChatContent() {
                             </Message>
                         )
                     })}
+                    {streamingMessage && (
+                        <Message
+                            key="streaming-assistant"
+                            className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6 items-start"
+                        >
+                            <div className="group flex w-full flex-col gap-0">
+                                <MessageContent
+                                    className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
+                                    markdown
+                                >
+                                    {streamingMessage.content}
+                                </MessageContent>
+                            </div>
+                        </Message>
+                    )}
                 </ChatContainerContent>
                 <div className="absolute bottom-4 left-1/2 flex w-full max-w-3xl -translate-x-1/2 justify-end px-5">
                     <ScrollButton className="border border-border-custom/75 shadow-none" />

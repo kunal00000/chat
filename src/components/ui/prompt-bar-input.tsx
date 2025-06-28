@@ -8,9 +8,10 @@ import {
     PromptInputTextarea,
 } from "@/components/ui/prompt-input"
 import { SUGGESTION_GROUPS } from "@/constants/prompt-kit.constants"
-import { CH, CHAT_ARGS } from "@/lib/chat.helpers"
+import { CH } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
-import { useChat } from "@ai-sdk/react"
+import { useChatStore } from "@/store/chat.store"
+import { useSSEStore } from "@/store/sse.store"
 import { motion } from "framer-motion"
 import { ArrowUp, BrainIcon, Mic } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -38,33 +39,28 @@ export function PromptBarInput({
     showSuggestions = false,
 }: PromptBarInputProps) {
     const nextRouter = useRouter()
-    const { input, setInput, status, append, handleInputChange } = useChat(CHAT_ARGS)
+    const { input, setInput, sendMessage } = useChatStore((s) => ({
+        input: s.input,
+        setInput: s.setInput,
+        sendMessage: s.sendMessage,
+        chatId: s.chatId,
+    }))
+    const status = useSSEStore((state) => state.status)
 
-    const handleSubmitWrapper = () => {
+    const handleSubmitWrapper = async () => {
         if (!input.trim()) {
             toast.error("Please enter a prompt")
             return
         }
 
-        if (navigateToChat) {
-            nextRouter.push("/chat/123")
-        }
-
         setInput("")
+        const chatId = await sendMessage(input.trim())
 
-        append({
-            role: "user",
-            content: input.trim(),
-        })
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSubmitWrapper()
+        if (navigateToChat) {
+            nextRouter.push(`/chat/${chatId}`)
         }
+        return;
     }
-
 
     return (
         <motion.div
@@ -75,9 +71,7 @@ export function PromptBarInput({
             <PromptInput
                 isLoading={CH.isPromptBarLoading(status)}
                 value={input}
-                onValueChange={(value) => {
-                    handleInputChange({ target: { value } } as React.ChangeEvent<HTMLTextAreaElement>)
-                }}
+                onValueChange={setInput}
                 onSubmit={handleSubmitWrapper}
                 className={cn("border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs", className)}
             >
@@ -85,7 +79,6 @@ export function PromptBarInput({
                     <PromptInputTextarea
                         placeholder={placeholder}
                         className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
-                        onKeyDown={handleKeyDown}
                     />
 
                     <PromptInputActions className={cn("mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3", !showAdditionalActions && "justify-end")}>

@@ -35,7 +35,7 @@ const RETRY_COUNT = 3;
 /**
  * Zustand store state for SSE stream handler.
  */
-type TStoreState<TStartStreamArgs, TRequestPayload, TMessageData = unknown> = {
+type TStoreState<TStartStreamArgs, TRequestPayload> = {
   abortController: AbortController;
   isLoading: () => boolean;
   isStopping: () => boolean;
@@ -43,10 +43,7 @@ type TStoreState<TStartStreamArgs, TRequestPayload, TMessageData = unknown> = {
   lastStreamStartArgs: null | TStartStreamArgs;
   retryCount: number;
   setStatus: (status: TSSEStatus) => void;
-  startStream: (
-    streamArgs: TStartStreamArgs,
-    onMessageCallback?: (data: TMessageData) => void
-  ) => Promise<TRequestPayload>;
+  startStream: (streamArgs: TStartStreamArgs) => Promise<TRequestPayload>;
   status: TSSEStatus;
   stopStream: () => Promise<void>;
 };
@@ -72,12 +69,10 @@ type TStreamResponse = {
  * Creates a Zustand store for managing SSE streams with robust status and error handling.
  * @param config - The SSE configuration object.
  */
-export function createBaseStore<
-  TStartStreamArgs,
-  TRequestPayload,
-  TMessageData = unknown
->(config: TSSEConfig<TStartStreamArgs, TRequestPayload>) {
-  return create<TStoreState<TStartStreamArgs, TRequestPayload, TMessageData>>()(
+export function createBaseStore<TStartStreamArgs, TRequestPayload>(
+  config: TSSEConfig<TStartStreamArgs, TRequestPayload>
+) {
+  return create<TStoreState<TStartStreamArgs, TRequestPayload>>()(
     (set, get) => ({
       abortController: new AbortController(),
       isLoading: () =>
@@ -90,7 +85,7 @@ export function createBaseStore<
       lastStreamStartArgs: null,
       retryCount: 0,
       setStatus: (newStatus: TSSEStatus) => set({ status: newStatus }),
-      startStream: async (streamArgs, onMessageCallback) => {
+      startStream: async (streamArgs) => {
         let requestPayload = null;
         if (get().status === "retrying" && get().lastRequestPayload) {
           requestPayload = get().lastRequestPayload;
@@ -144,10 +139,6 @@ export function createBaseStore<
                 // return;
               }
               const result = config.onMessage(chunk);
-              if (onMessageCallback && chunk.event === "message") {
-                const parsed = JSON.parse(chunk.data) as TMessageData;
-                onMessageCallback(parsed);
-              }
               return result;
             },
             onopen: async (chunk) => {
