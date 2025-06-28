@@ -1,9 +1,10 @@
 "use client"
 
-import { copyText, shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
+import { useCopyMessage } from "@/hooks/use-copy-message"
+import { shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
-import { Copy, Pencil, Trash } from "lucide-react"
+import { Pencil, Trash } from "lucide-react"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
 import { Message, MessageAction, MessageActions, MessageContent } from "../ui/message"
@@ -15,10 +16,12 @@ export default function ChatContent() {
         streamingMessage: s.streamingMessage,
     }))
 
+    const { handleCopy, getCopyIcon } = useCopyMessage();
+
     return (
         <div className="relative flex-1 overflow-y-auto">
             <ChatContainerRoot className="h-full">
-                <ChatContainerContent className="space-y-0 px-5 pt-20 pb-12">
+                <ChatContainerContent className="space-y-0 md:px-5 pt-20 pb-12">
                     {chatMessages.map((message, index) => {
                         const isAssistant = message.role === "assistant"
                         const isLastMessage = index === chatMessages.length - 1
@@ -50,9 +53,9 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
-                                                    onClick={() => copyText(message.content)}
+                                                    onClick={() => handleCopy(message)}
                                                 >
-                                                    <Copy />
+                                                    {getCopyIcon(message.id)}
                                                 </Button>
                                             </MessageAction>
                                         </MessageActions>
@@ -92,9 +95,9 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
-                                                    onClick={() => copyText(message.content)}
+                                                    onClick={() => handleCopy(message)}
                                                 >
-                                                    <Copy />
+                                                    {getCopyIcon(message.id)}
                                                 </Button>
                                             </MessageAction>
                                         </MessageActions>
