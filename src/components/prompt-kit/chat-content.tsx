@@ -1,5 +1,6 @@
 "use client"
 
+import { shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
 import { Copy, Pencil, ThumbsDown, ThumbsUp, Trash } from "lucide-react"
@@ -75,7 +76,9 @@ export default function ChatContent() {
                                     </div>
                                 ) : (
                                     <div className="group flex flex-col items-end gap-1">
-                                        <MessageContent className="bg-secondary-custom text-main/95 max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                                        <MessageContent className={cn("bg-secondary-custom text-main/95 rounded-3xl px-5 py-2.5",
+                                            shouldUseMaxWidthMessage(message.content) && "max-w-[85%] sm:max-w-[75%]"
+                                        )}>
                                             {message.content}
                                         </MessageContent>
                                         <MessageActions
