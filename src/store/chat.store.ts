@@ -1,4 +1,5 @@
 import { getMessageId } from "@/lib/chat.helpers";
+import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn } from "zustand/traditional";
@@ -24,7 +25,7 @@ export type TChatStore = {
   setInput: (input: string) => void;
   setStreamingMessage: (delta: string) => void;
   loadMessagesForChatId: (chatId: string) => Promise<void>;
-  sendMessage: (content: string) => Promise<string>;
+  sendMessage: (content: string) => Promise<string | null>;
 };
 
 export const useChatStore = createWithEqualityFn<TChatStore>()(
@@ -51,6 +52,11 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       return;
     },
     sendMessage: async (content: string) => {
+      if (useSSEStore.getState().isLoading()) {
+        toast.error("Please wait for the current message to finish");
+        return null;
+      }
+
       let chatId = get().chatId;
       if (!chatId) {
         chatId = uuid();

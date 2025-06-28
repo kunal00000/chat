@@ -8,7 +8,6 @@ import {
     PromptInputTextarea,
 } from "@/components/ui/prompt-input"
 import { SUGGESTION_GROUPS } from "@/constants/prompt-kit.constants"
-import { CH } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
 import { useSSEStore } from "@/store/sse.store"
@@ -45,7 +44,7 @@ export function PromptBarInput({
         sendMessage: s.sendMessage,
         chatId: s.chatId,
     }))
-    const status = useSSEStore((state) => state.status)
+    const isLoading = useSSEStore((state) => state.isLoading())
 
     const handleSubmitWrapper = async () => {
         if (!input.trim()) {
@@ -56,7 +55,7 @@ export function PromptBarInput({
         setInput("")
         const chatId = await sendMessage(input.trim())
 
-        if (navigateToChat) {
+        if (navigateToChat && chatId) {
             nextRouter.push(`/chat/${chatId}`)
         }
         return;
@@ -69,7 +68,7 @@ export function PromptBarInput({
             className={cn("relative space-y-4", className)}
         >
             <PromptInput
-                isLoading={CH.isPromptBarLoading(status)}
+                isLoading={isLoading}
                 value={input}
                 onValueChange={setInput}
                 onSubmit={handleSubmitWrapper}
@@ -102,11 +101,11 @@ export function PromptBarInput({
 
                             <Button
                                 size="icon"
-                                disabled={!input.trim() || CH.isPromptBarLoading(status)}
+                                disabled={!input.trim() || isLoading}
                                 onClick={handleSubmitWrapper}
                                 className="size-9 rounded-full"
                             >
-                                {!CH.isPromptBarLoading(status) ? (
+                                {!isLoading ? (
                                     <ArrowUp size={18} />
                                 ) : (
                                     <span className="size-3 rounded-xs bg-white" />
