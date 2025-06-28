@@ -22,5 +22,5 @@ export const CHAT_ARGS: UseChatOptions = {
 };
 
 export function getMessageId(role: "user" | "assistant") {
-  return `${role}-msg-${Date.now()}${Math.random()}`;
+  return `${role.charAt(0)}-msg-${Date.now()}${Math.random()}`;
 }
