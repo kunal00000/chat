@@ -100,18 +100,24 @@ export function PromptBarInput({
                                 </PromptInputAction>
                             )}
 
-                            <Button
-                                size="icon"
-                                disabled={!input.trim() || isLoading}
-                                onClick={handleSubmitWrapper}
-                                className="size-9 rounded-full"
-                            >
-                                {!isLoading ? (
+                            {isLoading ? (
+                                <Button
+                                    size="icon"
+                                    onClick={() => useSSEStore.getState().stopStream()}
+                                    className="size-9 rounded-full"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="10" height="10" rx="2" fill="currentColor" /></svg>
+                                </Button>
+                            ) : (
+                                <Button
+                                    size="icon"
+                                    disabled={!input.trim() || isLoading}
+                                    onClick={handleSubmitWrapper}
+                                    className="size-9 rounded-full"
+                                >
                                     <ArrowUp size={18} />
-                                ) : (
-                                    <span className="size-3 rounded-xs bg-white" />
-                                )}
-                            </Button>
+                                </Button>
+                            )}
                         </div>
                     </PromptInputActions>
                 </div>

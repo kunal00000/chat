@@ -23,7 +23,7 @@ export const CHAT_ARGS: UseChatOptions = {
 };
 
 export function getMessageId(role: "user" | "assistant") {
-  return `${role.charAt(0)}-msg-${Date.now()}${Math.random()}`;
+  return `${role.charAt(0)}-msg-${Date.now()}${Math.random().toFixed(3)}`;
 }
 
 export function shouldUseMaxWidthMessage(content: string) {

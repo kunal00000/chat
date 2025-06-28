@@ -35,16 +35,6 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TRequestPayload>({
           break;
 
         case "end_stream":
-          useChatStore.setState((state) => {
-            if (state.streamingMessage) {
-              return {
-                messages: [...state.messages, state.streamingMessage],
-                streamingMessage: null,
-              };
-            }
-            return {};
-          });
-          break;
         default:
       }
     } catch (e) {
@@ -56,5 +46,14 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TRequestPayload>({
   },
   onClose: () => {
     console.log("SSE stream closed");
+    useChatStore.setState((state) => {
+      if (state.streamingMessage) {
+        return {
+          messages: [...state.messages, state.streamingMessage],
+          streamingMessage: null,
+        };
+      }
+      return {};
+    });
   },
 });

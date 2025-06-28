@@ -3,7 +3,6 @@ import {
   fetchEventSource,
   type FetchEventSourceInit,
 } from "@microsoft/fetch-event-source";
-import { toast } from "sonner";
 import { create } from "zustand";
 
 export type TSSEStatus =
@@ -26,7 +25,6 @@ export type TSSEConfig<TStartStreamArgs, TRequestPayload> = {
   onError: NonNullable<FetchEventSourceInit["onerror"]>;
   onMessage: NonNullable<FetchEventSourceInit["onmessage"]>;
   onOpen: NonNullable<FetchEventSourceInit["onopen"]>;
-  stopRequest?: (lastRequestPayload: TRequestPayload) => Promise<unknown>;
   url: string;
 };
 
@@ -200,13 +198,7 @@ export function createBaseStore<TStartStreamArgs, TRequestPayload>(
           return;
         }
         set({ status: "stopping" });
-        const stopRequestPayload = get().lastRequestPayload;
-        if (config.stopRequest && stopRequestPayload) {
-          await config.stopRequest(stopRequestPayload).catch((error) => {
-            console.error("Failed to stop stream", error);
-            toast.error("Failed to stop generating response");
-          });
-        }
+        get().abortController.abort();
         set({ status: "idle" });
         config.onClose();
       },

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const { textStream } = streamText({
-    model: google("gemini-2.0-flash-001", {
+    model: google("gemini-2.0-flash-lite-preview-02-05", {
       useSearchGrounding: true,
     }),
     messages,
@@ -17,6 +17,7 @@ export async function POST(req: Request) {
       chunking: /.{10}/m,
       delayInMs: 15,
     }),
+    abortSignal: req.signal,
   });
 
   const streamer = createStreamer();
