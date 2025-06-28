@@ -1,5 +1,6 @@
 import { TSSEStatus } from "@/store/sse.helpers";
 import { UseChatOptions } from "@ai-sdk/react";
+import { toast } from "sonner";
 
 export const CH = {
   isPromptBarLoading: (status: TSSEStatus) => {
@@ -30,4 +31,9 @@ export function shouldUseMaxWidthMessage(content: string) {
   if (content.split(" ").length > 5) return true;
 
   return false;
+}
+
+export function copyText(text: string) {
+  navigator.clipboard.writeText(text);
+  toast.info("Copied to clipboard");
 }

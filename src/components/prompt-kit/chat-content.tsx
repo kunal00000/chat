@@ -1,9 +1,9 @@
 "use client"
 
-import { shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
+import { copyText, shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
-import { Copy, Pencil, ThumbsDown, ThumbsUp, Trash } from "lucide-react"
+import { Copy, Pencil, Trash } from "lucide-react"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
 import { Message, MessageAction, MessageActions, MessageContent } from "../ui/message"
@@ -50,26 +50,9 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
+                                                    onClick={() => copyText(message.content)}
                                                 >
                                                     <Copy />
-                                                </Button>
-                                            </MessageAction>
-                                            <MessageAction tooltip="Upvote" delayDuration={100}>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="rounded-full"
-                                                >
-                                                    <ThumbsUp />
-                                                </Button>
-                                            </MessageAction>
-                                            <MessageAction tooltip="Downvote" delayDuration={100}>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="rounded-full"
-                                                >
-                                                    <ThumbsDown />
                                                 </Button>
                                             </MessageAction>
                                         </MessageActions>
@@ -109,6 +92,7 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
+                                                    onClick={() => copyText(message.content)}
                                                 >
                                                     <Copy />
                                                 </Button>
