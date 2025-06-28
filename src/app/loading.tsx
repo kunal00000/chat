@@ -1,4 +1,4 @@
-import Loader from "@/icons/loader";
+import Loader from "@/components/ui/icons/loader";
 
 export default function Loading() {
     return (
