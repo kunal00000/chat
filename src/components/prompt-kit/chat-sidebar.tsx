@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
     Sidebar,
     SidebarContent,
@@ -10,16 +10,16 @@ import {
     SidebarMenu,
     SidebarMenuButton
 } from "@/components/ui/sidebar"
+import { PATHS } from "@/constants/chat.constants"
 import { CONVERSATION_HISTORY } from "@/constants/prompt-kit.constants"
+import { cn } from "@/lib/utils"
 import {
     PlusIcon,
     Search
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export function ChatSidebar() {
-    const nextRouter = useRouter()
-
     return (
         <Sidebar className="border-none">
             <SidebarHeader className="flex flex-row items-center justify-between gap-2 px-2 py-4 bg-border-custom/50">
@@ -35,14 +35,10 @@ export function ChatSidebar() {
             </SidebarHeader>
             <SidebarContent className="pt-4 bg-border-custom/50">
                 <div className="px-4">
-                    <Button
-                        variant="outline"
-                        className="mb-4 flex w-full items-center gap-2 border-none shadow-none bg-background-custom hover:bg-background-custom"
-                        onClick={() => nextRouter.push("/")}
-                    >
+                    <Link href={PATHS.NEW_CHAT} className={cn(buttonVariants({ variant: "outline" }), "mb-4 flex w-full items-center gap-2 border-none shadow-none bg-background-custom hover:bg-background-custom")}>
                         <PlusIcon className="size-4" />
                         <span>New Chat</span>
-                    </Button>
+                    </Link>
                 </div>
                 {CONVERSATION_HISTORY.map((group) => (
                     <SidebarGroup key={group.period}>
