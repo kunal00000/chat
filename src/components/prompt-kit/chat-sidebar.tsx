@@ -18,17 +18,15 @@ import {
     Search
 } from "lucide-react"
 import Link from "next/link"
+import Logo from "../ui/icons/logo"
 
 export function ChatSidebar() {
     return (
         <Sidebar className="border-none">
-            <SidebarHeader className="flex flex-row items-center justify-between gap-2 px-2 py-4 bg-border-custom/50">
-                <div className="flex flex-row items-center gap-2 px-2">
-                    <div className="bg-primary/10 size-8 rounded-md"></div>
-                    <div className="text-md font-medium text-primary tracking-tight">
-                        vukchat
-                    </div>
-                </div>
+            <SidebarHeader className="flex flex-row items-center justify-between gap-2 p-4 bg-border-custom/50">
+                <Link href={PATHS.NEW_CHAT}>
+                    <Logo className="bg-border-custom/70 size-8 rounded-md" />
+                </Link>
                 <Button variant="ghost" className="size-8">
                     <Search className="size-4" />
                 </Button>

@@ -51,6 +51,8 @@
   --color-main: var(--main);
   --color-off: var(--off);
   --color-custom: var(--custom);
+  --color-custom-light: var(--custom-light);
+  --color-custom-dark: var(--custom-dark);
   --shadow-2xs-dark: var(--shadow-2xs-dark);
   --shadow-xs-dark: var(--shadow-xs-dark);
   --shadow-sm-dark: var(--shadow-sm-dark);
@@ -111,6 +113,8 @@
   --main: oklch(0.304 0.04 213.681);
   --off: oklch(0.502 0.008 106.677);
   --custom: oklch(0.5999 0 0);
+  --custom-light: oklch(0.9491 0 0);
+  --custom-dark: oklch(0.8975 0 0);
   --shadow-2xs-dark: 3px 6px 1px 0px hsl(0 0% 86.6667% / 0.5);
   --shadow-xs-dark: 3px 6px 1px 0px hsl(0 0% 86.6667% / 0.5);
   --shadow-sm-dark: 3px 6px 1px 0px hsl(0 0% 86.6667% / 1),
