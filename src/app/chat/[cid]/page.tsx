@@ -1,4 +1,4 @@
-import ChatContent from "@/components/prompt-kit/chat-content";
+import ChatContent from "@/components/chat/chat-content";
 import { PromptBarInput } from "@/components/ui/prompt-bar-input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
