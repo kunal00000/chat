@@ -8,7 +8,7 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const { textStream } = streamText({
+  const llmStreamResponse = streamText({
     model: google("gemini-2.0-flash-lite-preview-02-05", {
       useSearchGrounding: true,
     }),
@@ -22,7 +22,12 @@ export async function POST(req: Request) {
 
   const streamer = createStreamer();
 
-  streamer.streamTextStream(textStream).then(() => {
+  streamer.streamTextStream(llmStreamResponse.textStream).then(async () => {
+    const usage = await llmStreamResponse.usage;
+    if (usage) {
+      streamer.appendEvent({ usage }, "usage");
+    }
+
     streamer.close();
   });
 
