@@ -6,7 +6,7 @@ export default function Logo(props: Omit<ImageProps, "src" | "alt"> & { classNam
             width={32}
             height={32}
             {...props}
-            src="/logo.webp"
+            src="/logo2.webp"
             alt="logo"
         />
     )

@@ -25,7 +25,7 @@ export function ChatSidebar() {
         <Sidebar className="border-none">
             <SidebarHeader className="flex flex-row items-center justify-between gap-2 p-4 bg-border-custom/50">
                 <Link href={PATHS.NEW_CHAT}>
-                    <Logo className="bg-border-custom/70 size-8 rounded-md" />
+                    <Logo className="size-8 rounded-md" />
                 </Link>
                 <Button variant="ghost" className="size-8">
                     <Search className="size-4" />
