@@ -1,13 +1,7 @@
-"use client"
-
+import ResetChatEffects from "@/components/common/reset-chat-effect";
 import { PromptBarInput } from "@/components/ui/prompt-bar-input";
-import { useChatStore } from "@/store/chat.store";
-import { useEffect } from "react";
 
 export default function Home() {
-    useEffect(() => {
-        useChatStore.setState({ chatId: null })
-    }, [])
 
     return (
         <main className="bg-border-custom/50 h-screen w-full md:pt-2 md:pl-2">
@@ -21,6 +15,7 @@ export default function Home() {
                     />
                 </div>
             </div>
+            <ResetChatEffects />
         </main>
     );
 }

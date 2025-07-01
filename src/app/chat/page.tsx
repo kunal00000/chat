@@ -1,3 +1,4 @@
+import ResetChatEffects from "@/components/common/reset-chat-effect";
 import { PromptBarInput } from "@/components/ui/prompt-bar-input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export default async function ChatHomePage() {
                     navigateToChat={true}
                 />
             </div>
+            <ResetChatEffects />
         </main>
     )
 }
