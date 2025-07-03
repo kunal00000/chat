@@ -10,9 +10,9 @@ import {
     SidebarMenu,
     SidebarMenuButton
 } from "@/components/ui/sidebar"
-import { PATHS } from "@/constants/chat.constants"
-import { CONVERSATION_HISTORY } from "@/constants/prompt-kit.constants"
 import { cn } from "@/lib/utils"
+import { PATHS } from "@/types-constants-schemas/client/chat.constants"
+import { CONVERSATION_HISTORY } from "@/types-constants-schemas/client/prompt-kit.constants"
 import {
     PlusIcon,
     Search

@@ -1,4 +1,4 @@
-import { TChatMessage } from "../types/client-types/chat.types";
+import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
 

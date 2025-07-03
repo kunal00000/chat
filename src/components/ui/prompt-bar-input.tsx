@@ -7,10 +7,10 @@ import {
     PromptInputActions,
     PromptInputTextarea,
 } from "@/components/ui/prompt-input"
-import { SUGGESTION_GROUPS } from "@/constants/prompt-kit.constants"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
 import { useSSEStore } from "@/store/sse.store"
+import { SUGGESTION_GROUPS } from "@/types-constants-schemas/client/prompt-kit.constants"
 import { motion } from "framer-motion"
 import { ArrowUp, BrainIcon, Mic } from "lucide-react"
 import { useRouter } from "next/navigation"

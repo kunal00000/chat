@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn } from "zustand/traditional";
-import { TChatMessage } from "../types/client-types/chat.types";
+import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useSSEStore } from "./sse.store";
 
 // Type guard for error with message

@@ -1,5 +1,5 @@
-import { isClient } from "@/constants/global.constants";
-import { AppType } from "@/types/server-types/hono-app.types";
+import { isClient } from "@/types-constants-schemas/client/global.constants";
+import { AppType } from "@/types-constants-schemas/server/hono-app.types";
 import { hc } from "hono/client";
 
 export const getBaseUrl = () => {
