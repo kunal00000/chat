@@ -1,6 +1,4 @@
-import { Context } from "hono";
-
-export function createStreamer(c?: Context) {
+export function createStreamer() {
   let controller: ReadableStreamDefaultController<Uint8Array> | null = null;
   const textEncoder = new TextEncoder();
 
@@ -41,12 +39,6 @@ export function createStreamer(c?: Context) {
   }
 
   function toResponse() {
-    if (c) {
-      c.header("Content-Type", "text/event-stream");
-      c.header("Cache-Control", "no-cache");
-      c.header("Connection", "keep-alive");
-    }
-
     return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
