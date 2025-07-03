@@ -37,7 +37,7 @@ export default function ChatContent() {
                                 {isAssistant ? (
                                     <div className="group flex w-full flex-col gap-0">
                                         <MessageContent
-                                            className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0 leading-relaxed"
+                                            className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
                                             markdown
                                         >
                                             {message.content}
