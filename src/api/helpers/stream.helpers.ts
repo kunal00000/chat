@@ -41,6 +41,7 @@ export function createStreamer() {
     return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
+        "Content-Encoding": "none",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
