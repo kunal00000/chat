@@ -28,14 +28,12 @@ export const chatController = new Hono<Env>().post(
         abortSignal: c.req.raw.signal,
       });
 
-      streamer.streamTextStream(llmStreamResponse.textStream).then(async () => {
-        const usage = await llmStreamResponse.usage;
-        if (usage) {
-          streamer.appendEvent({ usage }, "usage");
-        }
+      await streamer.streamTextStream(llmStreamResponse.textStream);
 
-        streamer.close();
-      });
+      const usage = await llmStreamResponse.usage;
+      streamer.appendEvent({ usage }, "usage");
+
+      streamer.close();
     })();
 
     return response;
