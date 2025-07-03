@@ -11,7 +11,7 @@ export const chatController = new Hono<Env>().post(
   async (c) => {
     const { messages } = c.req.valid("json");
 
-    const streamer = createStreamer();
+    const streamer = createStreamer(c);
     streamer.appendEvent({}, "start_stream");
     const response = streamer.toResponse();
 
