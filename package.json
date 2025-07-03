@@ -11,6 +11,7 @@
     "dependencies": {
         "@ai-sdk/google": "^1.2.19",
         "@ai-sdk/react": "^1.2.12",
+        "@hono/zod-validator": "^0.7.0",
         "@microsoft/fetch-event-source": "^2.0.1",
         "@radix-ui/react-avatar": "^1.1.10",
         "@radix-ui/react-dialog": "^1.1.14",
@@ -22,6 +23,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "framer-motion": "^12.18.1",
+        "hono": "^4.8.3",
         "lucide-react": "^0.522.0",
         "marked": "^15.0.12",
         "next": "15.3.4",
