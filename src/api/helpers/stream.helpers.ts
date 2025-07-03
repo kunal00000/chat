@@ -1,9 +1,10 @@
 import { Context } from "hono";
 
 export function createStreamer(c?: Context) {
-  let controller: ReadableStreamDefaultController | null = null;
+  let controller: ReadableStreamDefaultController<Uint8Array> | null = null;
+  const textEncoder = new TextEncoder();
 
-  const stream = new ReadableStream({
+  const stream = new ReadableStream<Uint8Array>({
     start(ctrl) {
       controller = ctrl;
     },
@@ -22,7 +23,7 @@ export function createStreamer(c?: Context) {
       payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
     }
 
-    controller.enqueue(payload);
+    controller.enqueue(textEncoder.encode(payload));
   }
 
   async function streamTextStream(textStream: AsyncIterable<string>) {
@@ -42,7 +43,6 @@ export function createStreamer(c?: Context) {
   function toResponse() {
     if (c) {
       c.header("Content-Type", "text/event-stream");
-      c.header("Content-Encoding", "none");
       c.header("Cache-Control", "no-cache");
       c.header("Connection", "keep-alive");
     }
@@ -50,7 +50,6 @@ export function createStreamer(c?: Context) {
     return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
-        "Content-Encoding": "none",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
