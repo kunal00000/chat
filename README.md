@@ -12,10 +12,10 @@ An AI chat built to experiment with new developments in the AI space and to aggr
   - Memory optimizations for long-term context and retrieval
   - Rapid prototyping of new AI SDK features and capabilities
 
-## Technologies Used
+## Built with
 
-- **Next.js:** Framework for server-side rendering and static site generation
+- **Next.js:** React framework
 - **TypeScript:** Strongly-typed language for safer and more maintainable code
 - **Zustand:** State management for efficient and predictable state updates
-- **AI SDK:** Integration layer for connecting to AI models and tool-calling APIs
+- **AI SDK:** AI model integration
 - **Hono:** Lightweight, fast web framework for building API endpoints and server logic
