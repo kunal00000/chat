@@ -14,8 +14,8 @@ An AI chat built to experiment with new developments in the AI space and to aggr
 
 ## Built with
 
-- **Next.js:** React framework
-- **TypeScript:** Strongly-typed language for safer and more maintainable code
-- **Zustand:** State management for efficient and predictable state updates
-- **AI SDK:** AI model integration
-- **Hono:** Lightweight, fast web framework for building API endpoints and server logic
+- **[Next.js](https://nextjs.org):** React framework
+- **[TypeScript](https://www.typescriptlang.org):** Strongly-typed language for safer and more maintainable code
+- **[Zustand](https://zustand.docs.pmnd.rs):** State management for efficient and predictable state updates
+- **[AI SDK](https://ai-sdk.dev/docs/introduction):** AI model integration
+- **[Hono](https://hono.dev):** Lightweight, fast web framework for building API endpoints and server logic
