@@ -7,13 +7,15 @@ import { useChatStore } from "@/store/chat.store"
 import { Pencil, Trash } from "lucide-react"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
+import { PromptkitLoader } from "../ui/loader"
 import { Message, MessageAction, MessageActions, MessageContent } from "../ui/message"
 import { ScrollButton } from "../ui/scroll-button"
 
 export default function ChatContent() {
-    const { chatMessages, streamingMessage } = useChatStore((s) => ({
+    const { chatMessages, streamingMessage, isFirstChunkPending } = useChatStore((s) => ({
         chatMessages: s.messages,
         streamingMessage: s.streamingMessage,
+        isFirstChunkPending: s.isFirstChunkPending()
     }))
 
     const { handleCopy, getCopyIcon } = useCopyToClipboard();
@@ -106,6 +108,14 @@ export default function ChatContent() {
                             </Message>
                         )
                     })}
+                    {isFirstChunkPending ? (
+                        <Message
+                            key="loading"
+                            className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6 items-start"
+                        >
+                            <PromptkitLoader variant="loading-dots" size="md" text="Loading" />
+                        </Message>
+                    ) : null}
                     {streamingMessage && (
                         <Message
                             key="streaming-assistant"

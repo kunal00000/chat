@@ -23,6 +23,7 @@ export type TChatStore = {
   error?: string;
   chatId: string | null;
   setInput: (input: string) => void;
+  isFirstChunkPending: () => boolean;
   setStreamingMessage: (delta: string) => void;
   loadMessagesForChatId: (chatId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<string | null>;
@@ -36,6 +37,13 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
     error: undefined,
     chatId: null,
     setInput: (input) => set({ input }),
+    isFirstChunkPending: () => {
+      return (
+        useSSEStore.getState().status === "pending" ||
+        (useSSEStore.getState().status === "streaming" &&
+          get().streamingMessage === null)
+      );
+    },
     setStreamingMessage: (delta) =>
       set({
         streamingMessage: {
