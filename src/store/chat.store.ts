@@ -1,5 +1,4 @@
 import { getMessageId } from "@/lib/chat.helpers";
-import { TOutgoingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import { shallow } from "zustand/shallow";
@@ -7,7 +6,6 @@ import { createWithEqualityFn } from "zustand/traditional";
 import {
   TAssistantMessage,
   TChatMessage,
-  TPartType,
 } from "../types-constants-schemas/client/chat.types";
 import { useSSEStore } from "./sse.store";
 
@@ -31,10 +29,6 @@ export type TChatStore = {
   sendMessage: (content: string) => Promise<string | null>;
 
   streamingMessage: TAssistantMessage | null;
-  setStreamingMessage: (chunk: {
-    type: TOutgoingChunkType;
-    textDelta: string;
-  }) => void;
   isFirstChunkPending: () => boolean;
 
   error?: string;
@@ -55,47 +49,6 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
         (useSSEStore.getState().status === "streaming" &&
           get().streamingMessage === null)
       );
-    },
-    setStreamingMessage: (chunk) => {
-      const streamingMessageState = get().streamingMessage;
-
-      const newContent = streamingMessageState?.content ?? [];
-      if (chunk.type.includes("start")) {
-        const lastPart = newContent[newContent.length - 1];
-        if (lastPart && lastPart.type === "reasoning" && lastPart.isStreaming) {
-          lastPart.isStreaming = false;
-        }
-
-        const partType = chunk.type.split("-")[0] as TPartType;
-
-        switch (partType) {
-          case "reasoning":
-            newContent.push({
-              type: "reasoning",
-              text: chunk.textDelta,
-              isStreaming: true,
-            });
-            break;
-          case "text":
-            newContent.push({
-              type: "text",
-              text: chunk.textDelta,
-            });
-            break;
-        }
-      }
-
-      if (chunk.type.includes("delta")) {
-        newContent[newContent.length - 1].text += chunk.textDelta;
-      }
-
-      set({
-        streamingMessage: {
-          content: newContent,
-          role: "assistant",
-          id: streamingMessageState?.id ?? getMessageId("assistant"),
-        },
-      });
     },
     loadMessagesForChatId: async (chatId) => {
       // Implement your logic to load messages for a chatId

@@ -1,4 +1,9 @@
-import { TChatMessage } from "../types-constants-schemas/client/chat.types";
+import { getMessageId } from "@/lib/chat.helpers";
+import { TOutgoingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
+import {
+  TChatMessage,
+  TPartType,
+} from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
 
@@ -31,7 +36,7 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TRequestPayload>({
 
       switch (chunk.event) {
         case "message":
-          useChatStore.getState().setStreamingMessage(parsedData);
+          toUIStreamingMessage(parsedData);
           break;
 
         case "end_stream":
@@ -57,3 +62,48 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TRequestPayload>({
     });
   },
 });
+
+function toUIStreamingMessage(chunkData: {
+  type: TOutgoingChunkType;
+  textDelta: string;
+}) {
+  const streamingMessageState = useChatStore.getState().streamingMessage;
+
+  const newContent = streamingMessageState?.content ?? [];
+  if (chunkData.type.includes("start")) {
+    const lastPart = newContent[newContent.length - 1];
+    if (lastPart && lastPart.type === "reasoning" && lastPart.isStreaming) {
+      lastPart.isStreaming = false;
+    }
+
+    const partType = chunkData.type.split("-")[0] as TPartType;
+
+    switch (partType) {
+      case "reasoning":
+        newContent.push({
+          type: "reasoning",
+          text: chunkData.textDelta,
+          isStreaming: true,
+        });
+        break;
+      case "text":
+        newContent.push({
+          type: "text",
+          text: chunkData.textDelta,
+        });
+        break;
+    }
+  }
+
+  if (chunkData.type.includes("delta")) {
+    newContent[newContent.length - 1].text += chunkData.textDelta;
+  }
+
+  useChatStore.setState({
+    streamingMessage: {
+      content: newContent,
+      role: "assistant",
+      id: streamingMessageState?.id ?? getMessageId("assistant"),
+    },
+  });
+}
