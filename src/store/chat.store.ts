@@ -22,25 +22,29 @@ function isErrorWithMessage(err: unknown): err is { message: string } {
 }
 
 export type TChatStore = {
-  messages: TChatMessage[];
-  streamingMessage: TAssistantMessage | null;
-  input: string;
-  error?: string;
   chatId: string | null;
+  messages: TChatMessage[];
+  loadMessagesForChatId: (chatId: string) => Promise<void>;
+
+  input: string;
   setInput: (input: string) => void;
-  isFirstChunkPending: () => boolean;
+  sendMessage: (content: string) => Promise<string | null>;
+
+  streamingMessage: TAssistantMessage | null;
   setStreamingMessage: (chunk: {
     type: TOutgoingChunkType;
     textDelta: string;
   }) => void;
-  loadMessagesForChatId: (chatId: string) => Promise<void>;
-  sendMessage: (content: string) => Promise<string | null>;
+  isFirstChunkPending: () => boolean;
+
+  error?: string;
 };
 
 export const useChatStore = createWithEqualityFn<TChatStore>()(
   (set, get) => ({
     messages: [],
     streamingMessage: null,
+    streamingReasoning: null,
     input: "",
     error: undefined,
     chatId: null,

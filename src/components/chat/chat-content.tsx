@@ -9,13 +9,14 @@ import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
 import { PromptkitLoader } from "../ui/loader"
 import { Message, MessageAction, MessageActions, MessageContent } from "../ui/message"
+import { Reasoning, ReasoningContent, ReasoningTrigger } from "../ui/reasoning"
 import { ScrollButton } from "../ui/scroll-button"
 
 export default function ChatContent() {
     const { chatMessages, streamingMessage, isFirstChunkPending } = useChatStore((s) => ({
         chatMessages: s.messages,
         streamingMessage: s.streamingMessage,
-        isFirstChunkPending: s.isFirstChunkPending()
+        isFirstChunkPending: s.isFirstChunkPending(),
     }))
 
     const { handleCopy, getCopyIcon } = useCopyToClipboard();
@@ -48,6 +49,20 @@ export default function ChatContent() {
                                                     >
                                                         {part.text}
                                                     </MessageContent>
+                                                )
+                                            }
+
+                                            if (part.type === "reasoning") {
+                                                return (
+                                                    <Reasoning key={part.text} isStreaming={true}>
+                                                        <ReasoningTrigger>Thinking</ReasoningTrigger>
+                                                        <ReasoningContent
+                                                            markdown
+                                                            className="ml-2 border-l-2 border-l-slate-200 px-2 pb-1 dark:border-l-slate-700"
+                                                        >
+                                                            {part.text}
+                                                        </ReasoningContent>
+                                                    </Reasoning>
                                                 )
                                             }
 
@@ -125,26 +140,43 @@ export default function ChatContent() {
                             <PromptkitLoader variant="loading-dots" size="md" text="Loading" />
                         </Message>
                     ) : null}
+
                     {streamingMessage && (
                         <Message
                             key="streaming-assistant"
                             className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6 items-start"
                         >
-                            {streamingMessage.content.map((part) => {
-                                if (part.type === "text") {
-                                    return (<div key={part.text} className="group flex w-full flex-col gap-0">
-                                        <MessageContent
-                                            className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
-                                            markdown
-                                        >
-                                            {part.text}
-                                        </MessageContent>
-                                    </div>
-                                    )
-                                }
+                            <div className="group flex w-full flex-col gap-0">
+                                {streamingMessage.content.map((part) => {
+                                    if (part.type === "text") {
+                                        return (
+                                            <MessageContent
+                                                key={part.text}
+                                                className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
+                                                markdown
+                                            >
+                                                {part.text}
+                                            </MessageContent>
+                                        )
+                                    }
 
-                                return null
-                            })}
+                                    if (part.type === "reasoning") {
+                                        return (
+                                            <Reasoning key={part.text} isStreaming={true}>
+                                                <ReasoningTrigger>Thinking</ReasoningTrigger>
+                                                <ReasoningContent
+                                                    markdown
+                                                    className="ml-2 border-l-2 border-l-slate-200 px-2 pb-1 dark:border-l-slate-700"
+                                                >
+                                                    {part.text}
+                                                </ReasoningContent>
+                                            </Reasoning>
+                                        )
+                                    }
+
+                                    return null
+                                })}
+                            </div>
                         </Message>
                     )}
                 </ChatContainerContent>
