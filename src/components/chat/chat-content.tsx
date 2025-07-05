@@ -54,7 +54,7 @@ export default function ChatContent() {
 
                                             if (part.type === "reasoning") {
                                                 return (
-                                                    <Reasoning key={part.text} isStreaming={true}>
+                                                    <Reasoning key={part.text} isStreaming={part.isStreaming}>
                                                         <ReasoningTrigger>Thinking</ReasoningTrigger>
                                                         <ReasoningContent
                                                             markdown
@@ -162,7 +162,7 @@ export default function ChatContent() {
 
                                     if (part.type === "reasoning") {
                                         return (
-                                            <Reasoning key={part.text} isStreaming={true}>
+                                            <Reasoning key={part.text} isStreaming={part.isStreaming}>
                                                 <ReasoningTrigger>Thinking</ReasoningTrigger>
                                                 <ReasoningContent
                                                     markdown

@@ -61,10 +61,28 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
 
       const newContent = streamingMessageState?.content ?? [];
       if (chunk.type.includes("start")) {
-        newContent.push({
-          type: chunk.type.split("-")[0] as TPartType,
-          text: chunk.textDelta,
-        });
+        const lastPart = newContent[newContent.length - 1];
+        if (lastPart && lastPart.type === "reasoning" && lastPart.isStreaming) {
+          lastPart.isStreaming = false;
+        }
+
+        const partType = chunk.type.split("-")[0] as TPartType;
+
+        switch (partType) {
+          case "reasoning":
+            newContent.push({
+              type: "reasoning",
+              text: chunk.textDelta,
+              isStreaming: true,
+            });
+            break;
+          case "text":
+            newContent.push({
+              type: "text",
+              text: chunk.textDelta,
+            });
+            break;
+        }
       }
 
       if (chunk.type.includes("delta")) {

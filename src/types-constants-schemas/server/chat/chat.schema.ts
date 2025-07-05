@@ -15,6 +15,7 @@ const textPartSchema = z.object({
 const reasoningPartSchema = z.object({
   type: z.literal(MESSAGE_PARTS.Reasoning),
   text: z.string(),
+  isStreaming: z.boolean(),
 });
 
 const userMessageContentSchema = z.string();
