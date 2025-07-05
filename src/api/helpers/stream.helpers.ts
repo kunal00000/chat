@@ -35,14 +35,29 @@ export function createStreamer() {
   async function streamFullStream(
     fullStream: AsyncIterable<TextStreamPart<ToolSet>>
   ) {
+    let lastChunkType: TextStreamPart<ToolSet>["type"] | null = null;
+
     for await (const chunk of fullStream) {
       switch (chunk.type) {
         case "text-delta":
-          appendEvent({ content: chunk.textDelta, type: "text-delta" });
+          if (lastChunkType !== "text-delta") {
+            appendEvent({ textDelta: chunk.textDelta, type: "text-start" });
+            break;
+          }
+
+          appendEvent({ textDelta: chunk.textDelta, type: "text-delta" });
           break;
 
         case "reasoning":
-          appendEvent({ content: chunk.textDelta, type: "reasoning" });
+          if (lastChunkType !== "reasoning") {
+            appendEvent({
+              textDelta: chunk.textDelta,
+              type: "reasoning-start",
+            });
+            break;
+          }
+
+          appendEvent({ textDelta: chunk.textDelta, type: "reasoning-delta" });
           break;
 
         case "error":
@@ -60,6 +75,8 @@ export function createStreamer() {
           console.log({ chunk });
           break;
       }
+
+      lastChunkType = chunk.type;
     }
   }
 

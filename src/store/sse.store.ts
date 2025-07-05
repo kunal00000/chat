@@ -31,7 +31,7 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TRequestPayload>({
 
       switch (chunk.event) {
         case "message":
-          useChatStore.getState().setStreamingMessage(parsedData.content);
+          useChatStore.getState().setStreamingMessage(parsedData);
           break;
 
         case "end_stream":

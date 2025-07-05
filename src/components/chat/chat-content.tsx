@@ -38,12 +38,21 @@ export default function ChatContent() {
                             >
                                 {isAssistant ? (
                                     <div className="group flex w-full flex-col gap-0">
-                                        <MessageContent
-                                            className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
-                                            markdown
-                                        >
-                                            {message.content}
-                                        </MessageContent>
+                                        {message.content.map((part) => {
+                                            if (part.type === "text") {
+                                                return (
+                                                    <MessageContent
+                                                        key={part.text}
+                                                        className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
+                                                        markdown
+                                                    >
+                                                        {part.text}
+                                                    </MessageContent>
+                                                )
+                                            }
+
+                                            return null
+                                        })}
                                         <MessageActions
                                             className={cn(
                                                 "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
@@ -55,7 +64,7 @@ export default function ChatContent() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full"
-                                                    onClick={() => handleCopy(message.id, message.content)}
+                                                    onClick={() => handleCopy(message.id, message.content.map(part => part.type === "text" ? part.text : "").join(""))}
                                                 >
                                                     {getCopyIcon(message.id)}
                                                 </Button>
@@ -121,14 +130,21 @@ export default function ChatContent() {
                             key="streaming-assistant"
                             className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-6 items-start"
                         >
-                            <div className="group flex w-full flex-col gap-0">
-                                <MessageContent
-                                    className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
-                                    markdown
-                                >
-                                    {streamingMessage.content}
-                                </MessageContent>
-                            </div>
+                            {streamingMessage.content.map((part) => {
+                                if (part.type === "text") {
+                                    return (<div key={part.text} className="group flex w-full flex-col gap-0">
+                                        <MessageContent
+                                            className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
+                                            markdown
+                                        >
+                                            {part.text}
+                                        </MessageContent>
+                                    </div>
+                                    )
+                                }
+
+                                return null
+                            })}
                         </Message>
                     )}
                 </ChatContainerContent>

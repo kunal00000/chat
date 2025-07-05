@@ -3,7 +3,10 @@ import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import { shallow } from "zustand/shallow";
 import { createWithEqualityFn } from "zustand/traditional";
-import { TChatMessage } from "../types-constants-schemas/client/chat.types";
+import {
+  TAssistantMessage,
+  TChatMessage,
+} from "../types-constants-schemas/client/chat.types";
 import { useSSEStore } from "./sse.store";
 
 // Type guard for error with message
@@ -18,13 +21,16 @@ function isErrorWithMessage(err: unknown): err is { message: string } {
 
 export type TChatStore = {
   messages: TChatMessage[];
-  streamingMessage: TChatMessage | null;
+  streamingMessage: TAssistantMessage | null;
   input: string;
   error?: string;
   chatId: string | null;
   setInput: (input: string) => void;
   isFirstChunkPending: () => boolean;
-  setStreamingMessage: (delta: string) => void;
+  setStreamingMessage: (chunk: {
+    type: "text-delta" | "reasoning-delta";
+    textDelta: string;
+  }) => void;
   loadMessagesForChatId: (chatId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<string | null>;
 };
@@ -44,14 +50,29 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
           get().streamingMessage === null)
       );
     },
-    setStreamingMessage: (delta) =>
+    setStreamingMessage: (chunk) => {
+      const streamingMessageState = get().streamingMessage;
+
+      const newContent = streamingMessageState?.content ?? [];
+      if (chunk.type.includes("start")) {
+        newContent.push({
+          type: chunk.type.split("-")[0] as "text" | "reasoning",
+          text: chunk.textDelta,
+        });
+      }
+
+      if (chunk.type.includes("delta")) {
+        newContent[newContent.length - 1].text += chunk.textDelta;
+      }
+
       set({
         streamingMessage: {
-          content: (get().streamingMessage?.content ?? "") + delta,
+          content: newContent,
           role: "assistant",
-          id: getMessageId("assistant"),
+          id: streamingMessageState?.id ?? getMessageId("assistant"),
         },
-      }),
+      });
+    },
     loadMessagesForChatId: async (chatId) => {
       // Implement your logic to load messages for a chatId
       // This is a placeholder; replace with your actual logic
