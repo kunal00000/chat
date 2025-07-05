@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@ai-sdk/google": "^1.2.19",
+        "@ai-sdk/google": "^1.2.22",
         "@ai-sdk/react": "^1.2.12",
         "@hono/zod-validator": "^0.7.0",
         "@microsoft/fetch-event-source": "^2.0.1",
