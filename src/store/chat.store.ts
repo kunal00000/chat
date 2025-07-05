@@ -1,4 +1,5 @@
 import { getMessageId } from "@/lib/chat.helpers";
+import { TOutgoingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import { shallow } from "zustand/shallow";
@@ -6,6 +7,7 @@ import { createWithEqualityFn } from "zustand/traditional";
 import {
   TAssistantMessage,
   TChatMessage,
+  TPartType,
 } from "../types-constants-schemas/client/chat.types";
 import { useSSEStore } from "./sse.store";
 
@@ -28,7 +30,7 @@ export type TChatStore = {
   setInput: (input: string) => void;
   isFirstChunkPending: () => boolean;
   setStreamingMessage: (chunk: {
-    type: "text-delta" | "reasoning-delta";
+    type: TOutgoingChunkType;
     textDelta: string;
   }) => void;
   loadMessagesForChatId: (chatId: string) => Promise<void>;
@@ -56,7 +58,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       const newContent = streamingMessageState?.content ?? [];
       if (chunk.type.includes("start")) {
         newContent.push({
-          type: chunk.type.split("-")[0] as "text" | "reasoning",
+          type: chunk.type.split("-")[0] as TPartType,
           text: chunk.textDelta,
         });
       }

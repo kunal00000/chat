@@ -1,4 +1,5 @@
 import * as z from "zod/v4";
+import { MESSAGE_PARTS } from "./chat.constants";
 
 const systemMessageSchema = z.object({
   id: z.string(),
@@ -7,12 +8,12 @@ const systemMessageSchema = z.object({
 });
 
 const textPartSchema = z.object({
-  type: z.literal("text"),
+  type: z.literal(MESSAGE_PARTS.Text),
   text: z.string(),
 });
 
 const reasoningPartSchema = z.object({
-  type: z.literal("reasoning"),
+  type: z.literal(MESSAGE_PARTS.Reasoning),
   text: z.string(),
 });
 

@@ -3,6 +3,7 @@ import {
   chatMessageSchema,
 } from "@/types-constants-schemas/server/chat/chat.schema";
 import * as z from "zod/v4";
+import { MESSAGE_PARTS } from "../server/chat/chat.constants";
 
 export type TChatMessage = z.infer<typeof chatMessageSchema>;
 
@@ -23,3 +24,5 @@ export type TConversationHistory = {
     timestamp: number;
   }[];
 };
+
+export type TPartType = (typeof MESSAGE_PARTS)[keyof typeof MESSAGE_PARTS];

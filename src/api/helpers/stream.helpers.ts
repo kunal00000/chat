@@ -1,3 +1,4 @@
+import { IncomingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
 import { TextStreamPart, ToolSet } from "ai";
 
 export function createStreamer() {
@@ -27,8 +28,14 @@ export function createStreamer() {
   }
 
   async function streamTextStream(textStream: AsyncIterable<string>) {
+    let lastChunkType: IncomingChunkType | null = null;
     for await (const chunk of textStream) {
-      appendEvent({ content: chunk });
+      if (lastChunkType !== IncomingChunkType.TextDelta) {
+        appendEvent({ textDelta: chunk, type: "text-start" });
+      }
+
+      appendEvent({ textDelta: chunk, type: "text-delta" });
+      lastChunkType = IncomingChunkType.TextDelta;
     }
   }
 
@@ -39,8 +46,8 @@ export function createStreamer() {
 
     for await (const chunk of fullStream) {
       switch (chunk.type) {
-        case "text-delta":
-          if (lastChunkType !== "text-delta") {
+        case IncomingChunkType.TextDelta:
+          if (lastChunkType !== IncomingChunkType.TextDelta) {
             appendEvent({ textDelta: chunk.textDelta, type: "text-start" });
             break;
           }
@@ -48,8 +55,8 @@ export function createStreamer() {
           appendEvent({ textDelta: chunk.textDelta, type: "text-delta" });
           break;
 
-        case "reasoning":
-          if (lastChunkType !== "reasoning") {
+        case IncomingChunkType.ReasoningDelta:
+          if (lastChunkType !== IncomingChunkType.ReasoningDelta) {
             appendEvent({
               textDelta: chunk.textDelta,
               type: "reasoning-start",
