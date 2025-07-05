@@ -1,3 +1,5 @@
+import { TextStreamPart, ToolSet } from "ai";
+
 export function createStreamer() {
   let controller: ReadableStreamDefaultController<Uint8Array> | null = null;
   const textEncoder = new TextEncoder();
@@ -30,6 +32,37 @@ export function createStreamer() {
     }
   }
 
+  async function streamFullStream(
+    fullStream: AsyncIterable<TextStreamPart<ToolSet>>
+  ) {
+    for await (const chunk of fullStream) {
+      switch (chunk.type) {
+        case "text-delta":
+          appendEvent({ content: chunk.textDelta, type: "text-delta" });
+          break;
+
+        case "reasoning":
+          appendEvent({ content: chunk.textDelta, type: "reasoning" });
+          break;
+
+        case "error":
+        case "file":
+        case "reasoning-signature":
+        case "redacted-reasoning":
+        case "tool-call":
+        case "source":
+        case "step-start":
+        case "step-finish":
+        case "finish":
+        case "tool-call-delta":
+        case "tool-call-streaming-start":
+        default:
+          console.log({ chunk });
+          break;
+      }
+    }
+  }
+
   function close() {
     if (controller) {
       appendEvent({}, "end_stream");
@@ -51,6 +84,7 @@ export function createStreamer() {
   return {
     appendEvent,
     streamTextStream,
+    streamFullStream,
     close,
     toResponse,
   };

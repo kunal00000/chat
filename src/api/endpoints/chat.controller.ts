@@ -17,9 +17,16 @@ export const chatController = new Hono<Env>().post(
 
     (async () => {
       const llmStreamResponse = streamText({
-        model: google("gemini-2.0-flash-lite-preview-02-05", {
+        model: google("gemini-2.5-flash-preview-04-17", {
           useSearchGrounding: true,
         }),
+        providerOptions: {
+          google: {
+            thinkingConfig: {
+              includeThoughts: true,
+            },
+          },
+        },
         messages,
         experimental_transform: smoothStream({
           chunking: /.{10}/m,
@@ -28,7 +35,7 @@ export const chatController = new Hono<Env>().post(
         abortSignal: c.req.raw.signal,
       });
 
-      await streamer.streamTextStream(llmStreamResponse.textStream);
+      await streamer.streamFullStream(llmStreamResponse.fullStream);
 
       const usage = await llmStreamResponse.usage;
       streamer.appendEvent({ usage }, "usage");
