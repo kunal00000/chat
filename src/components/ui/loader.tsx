@@ -427,10 +427,12 @@ export function TextDotsLoader({
     className,
     text = "Thinking",
     size = "md",
+    textClassName = "text-main/80",
 }: {
     className?: string
     text?: string
     size?: "sm" | "md" | "lg"
+    textClassName?: string
 }) {
     const textSizes = {
         sm: "text-xs",
@@ -442,7 +444,7 @@ export function TextDotsLoader({
         <div
             className={cn("inline-flex items-center", className)}
         >
-            <span className={cn("text-primary font-medium", textSizes[size])}>
+            <span className={cn("text-primary font-medium", textSizes[size], textClassName)}>
                 {text}
             </span>
             <span className="inline-flex">
