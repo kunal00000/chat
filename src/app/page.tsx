@@ -1,7 +1,9 @@
 import ResetChatEffects from "@/components/common/reset-chat-effect";
 import { PromptBarInput } from "@/components/ui/prompt-bar-input";
+import { redirect } from "next/navigation";
 
 export default function Home() {
+    redirect("/chat")
 
     return (
         <main className="h-[100dvh] w-full">

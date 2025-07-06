@@ -1,5 +1,6 @@
 import { TSSEStatus } from "@/store/sse.helpers";
 import { UseChatOptions } from "@ai-sdk/react";
+import { v4 as uuid } from "uuid";
 
 export const CH = {
   isPromptBarLoading: (status: TSSEStatus) => {
@@ -22,7 +23,7 @@ export const CHAT_ARGS: UseChatOptions = {
 };
 
 export function getMessageId(role: "user" | "assistant") {
-  return `${role.charAt(0)}-msg-${Date.now()}${Math.random().toFixed(3)}`;
+  return `${role.charAt(0)}-msg-${uuid()}`;
 }
 
 export function shouldUseMaxWidthMessage(content: string) {
