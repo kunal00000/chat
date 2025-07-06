@@ -1,6 +1,7 @@
 import {
   assistantMessageSchema,
   chatMessageSchema,
+  userMessageSchema,
 } from "@/types-constants-schemas/server/chat/chat.schema";
 import * as z from "zod/v4";
 import { MESSAGE_PARTS } from "../server/chat/chat.constants";
@@ -8,6 +9,8 @@ import { MESSAGE_PARTS } from "../server/chat/chat.constants";
 export type TChatMessage = z.infer<typeof chatMessageSchema>;
 
 export type TAssistantMessage = z.infer<typeof assistantMessageSchema>;
+
+export type TUserMessage = z.infer<typeof userMessageSchema>;
 
 export type TSuggestionGroup = {
   label: string;

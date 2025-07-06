@@ -1,10 +1,9 @@
 "use client"
 
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
-import { shouldUseMaxWidthMessage } from "@/lib/chat.helpers"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
-import { Pencil, Trash } from "lucide-react"
+import { UserMessage } from "../messages/user-message"
 import { Button } from "../ui/button"
 import { ChatContainerContent, ChatContainerRoot } from "../ui/chat-container"
 import { PromptkitLoader } from "../ui/loader"
@@ -27,6 +26,7 @@ export default function ChatContent() {
                 <ChatContainerContent className="space-y-0 md:px-5 pt-20 pb-12">
                     {chatMessages.map((message, index) => {
                         const isAssistant = message.role === "assistant"
+                        const isUser = message.role === "user"
                         const isLastMessage = index === chatMessages.length - 1
 
                         return (
@@ -86,49 +86,9 @@ export default function ChatContent() {
                                             </MessageAction>
                                         </MessageActions>
                                     </div>
-                                ) : (
-                                    <div className="group flex flex-col items-end gap-1">
-                                        <MessageContent className={cn("bg-secondary-custom text-main/95 rounded-3xl px-5 py-2.5",
-                                            shouldUseMaxWidthMessage(message.content) && "max-w-[85%] sm:max-w-[75%]"
-                                        )}>
-                                            {message.content}
-                                        </MessageContent>
-                                        <MessageActions
-                                            className={cn(
-                                                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                                            )}
-                                        >
-                                            <MessageAction tooltip="Edit" delayDuration={100}>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="rounded-full"
-                                                >
-                                                    <Pencil />
-                                                </Button>
-                                            </MessageAction>
-                                            <MessageAction tooltip="Delete" delayDuration={100}>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="rounded-full"
-                                                >
-                                                    <Trash />
-                                                </Button>
-                                            </MessageAction>
-                                            <MessageAction tooltip="Copy" delayDuration={100}>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="rounded-full"
-                                                    onClick={() => handleCopy(message.id, message.content)}
-                                                >
-                                                    {getCopyIcon(message.id)}
-                                                </Button>
-                                            </MessageAction>
-                                        </MessageActions>
-                                    </div>
-                                )}
+                                ) : isUser ? (
+                                    <UserMessage message={message} />
+                                ) : null}
                             </Message>
                         )
                     })}
