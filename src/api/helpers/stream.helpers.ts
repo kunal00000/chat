@@ -67,12 +67,26 @@ export function createStreamer() {
           appendEvent({ textDelta: chunk.textDelta, type: "reasoning-delta" });
           break;
 
+        case "source":
+          if (lastChunkType !== "source") {
+            appendEvent({
+              type: "source-start",
+              source: chunk.source,
+            });
+            break;
+          }
+
+          appendEvent({
+            type: "source-delta",
+            source: chunk.source,
+          });
+          break;
+
         case "error":
         case "file":
         case "reasoning-signature":
         case "redacted-reasoning":
         case "tool-call":
-        case "source":
         case "step-start":
         case "step-finish":
         case "finish":

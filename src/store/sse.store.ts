@@ -1,9 +1,6 @@
 import { getMessageId } from "@/lib/chat.helpers";
 import { TOutgoingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
-import {
-  TChatMessage,
-  TPartType,
-} from "../types-constants-schemas/client/chat.types";
+import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
 
@@ -70,33 +67,37 @@ function toUIStreamingMessage(chunkData: {
   const streamingMessageState = useChatStore.getState().streamingMessage;
 
   const newContent = streamingMessageState?.content ?? [];
-  if (chunkData.type.includes("start")) {
-    const lastPart = newContent[newContent.length - 1];
-    if (lastPart && lastPart.type === "reasoning" && lastPart.isStreaming) {
-      lastPart.isStreaming = false;
-    }
 
-    const partType = chunkData.type.split("-")[0] as TPartType;
+  switch (chunkData.type) {
+    case "text-start":
+      newContent.push({
+        type: "text",
+        text: chunkData.textDelta,
+      });
+      break;
 
-    switch (partType) {
-      case "reasoning":
-        newContent.push({
-          type: "reasoning",
-          text: chunkData.textDelta,
-          isStreaming: true,
-        });
-        break;
-      case "text":
-        newContent.push({
-          type: "text",
-          text: chunkData.textDelta,
-        });
-        break;
-    }
+    case "reasoning-start":
+      newContent.push({
+        type: "reasoning",
+        text: chunkData.textDelta,
+        isStreaming: true,
+      });
+      break;
+
+    case "text-delta":
+    case "reasoning-delta":
+      newContent[newContent.length - 1].text += chunkData.textDelta;
+      break;
   }
 
-  if (chunkData.type.includes("delta")) {
-    newContent[newContent.length - 1].text += chunkData.textDelta;
+  const lastPart = newContent[newContent.length - 1];
+  if (
+    chunkData.type.includes("start") &&
+    lastPart &&
+    lastPart.type === "reasoning" &&
+    lastPart.isStreaming
+  ) {
+    lastPart.isStreaming = false;
   }
 
   useChatStore.setState({
