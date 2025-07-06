@@ -1,4 +1,3 @@
-import { IncomingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
 import { TextStreamPart, ToolSet } from "ai";
 
 export function createStreamer() {
@@ -28,76 +27,45 @@ export function createStreamer() {
   }
 
   async function streamTextStream(textStream: AsyncIterable<string>) {
-    let lastChunkType: IncomingChunkType | null = null;
     for await (const chunk of textStream) {
-      if (lastChunkType !== IncomingChunkType.TextDelta) {
-        appendEvent({ textDelta: chunk, type: "text-start" });
-      }
-
-      appendEvent({ textDelta: chunk, type: "text-delta" });
-      lastChunkType = IncomingChunkType.TextDelta;
+      appendEvent({ chunk });
     }
   }
 
   async function streamFullStream(
     fullStream: AsyncIterable<TextStreamPart<ToolSet>>
   ) {
-    let lastChunkType: TextStreamPart<ToolSet>["type"] | null = null;
-
     for await (const chunk of fullStream) {
       switch (chunk.type) {
-        case IncomingChunkType.TextDelta:
-          if (lastChunkType !== IncomingChunkType.TextDelta) {
-            appendEvent({ textDelta: chunk.textDelta, type: "text-start" });
-            break;
-          }
-
-          appendEvent({ textDelta: chunk.textDelta, type: "text-delta" });
-          break;
-
-        case IncomingChunkType.ReasoningDelta:
-          if (lastChunkType !== IncomingChunkType.ReasoningDelta) {
-            appendEvent({
-              textDelta: chunk.textDelta,
-              type: "reasoning-start",
-            });
-            break;
-          }
-
-          appendEvent({ textDelta: chunk.textDelta, type: "reasoning-delta" });
-          break;
-
-        case "source":
-          if (lastChunkType !== "source") {
-            appendEvent({
-              type: "source-start",
-              source: chunk.source,
-            });
-            break;
-          }
-
-          appendEvent({
-            type: "source-delta",
-            source: chunk.source,
-          });
-          break;
-
-        case "error":
-        case "file":
-        case "reasoning-signature":
-        case "redacted-reasoning":
+        case "text":
+        case "text-end":
+        case "text-start":
+        case "reasoning":
+        case "reasoning-end":
+        case "reasoning-start":
         case "tool-call":
-        case "step-start":
-        case "step-finish":
+        case "tool-input-start":
+        case "tool-input-delta":
+        case "tool-result":
+        case "tool-input-end":
+        case "tool-error":
+        case "source":
+        case "file":
+        case "raw":
+        case "error":
+          appendEvent(chunk);
+          break;
+
+        case "start":
+          appendEvent(chunk, "start_stream");
+          break;
+
+        case "start-step":
+        case "finish-step":
         case "finish":
-        case "tool-call-delta":
-        case "tool-call-streaming-start":
         default:
-          console.log({ chunk });
           break;
       }
-
-      lastChunkType = chunk.type;
     }
   }
 

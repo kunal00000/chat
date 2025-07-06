@@ -1,5 +1,5 @@
 import { getMessageId } from "@/lib/chat.helpers";
-import { TOutgoingChunkType } from "@/types-constants-schemas/server/streamer/streamer.types";
+import { TextStreamPart, ToolSet } from "ai";
 import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
@@ -54,38 +54,32 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TStartStreamArgs>({
   },
 });
 
-function toUIStreamingMessage(chunkData: {
-  type: TOutgoingChunkType;
-  textDelta: string;
-}) {
+function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
   const streamingMessageState = useChatStore.getState().streamingMessage;
   const newContent = streamingMessageState?.content ?? [];
 
   switch (chunkData.type) {
     case "text-start":
-      const lastPart = newContent[newContent.length - 1];
-      if (lastPart && lastPart.type === "reasoning" && lastPart.isStreaming) {
-        lastPart.isStreaming = false;
-      }
-
-      newContent.push({
-        type: "text",
-        text: chunkData.textDelta,
-      });
+      newContent.push({ type: "text", text: "" });
       break;
 
     case "reasoning-start":
-      newContent.push({
-        type: "reasoning",
-        text: chunkData.textDelta,
-        isStreaming: true,
-      });
+      newContent.push({ type: "reasoning", text: "", isStreaming: true });
       break;
 
-    case "text-delta":
-    case "reasoning-delta":
-      newContent[newContent.length - 1].text += chunkData.textDelta;
+    case "reasoning":
+    case "text":
+      newContent[newContent.length - 1].text += chunkData.text;
       break;
+
+    case "reasoning-end":
+      (
+        newContent[newContent.length - 1] as { isStreaming: boolean }
+      ).isStreaming = false;
+      break;
+
+    case "text-end":
+    default:
   }
 
   useChatStore.setState({

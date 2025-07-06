@@ -12,16 +12,14 @@ export const chatController = new Hono<Env>().post(
     const { messages } = c.req.valid("json");
 
     const streamer = createStreamer();
-    streamer.appendEvent({}, "start_stream");
     const response = streamer.toResponse();
 
     (async () => {
       const llmStreamResponse = streamText({
-        model: google("gemini-2.5-flash-preview-04-17", {
-          useSearchGrounding: true,
-        }),
+        model: google("gemini-2.5-flash-preview-04-17"),
         providerOptions: {
           google: {
+            useSearchGrounding: true,
             thinkingConfig: {
               includeThoughts: true,
             },
