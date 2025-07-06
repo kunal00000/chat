@@ -65,11 +65,15 @@ function toUIStreamingMessage(chunkData: {
   textDelta: string;
 }) {
   const streamingMessageState = useChatStore.getState().streamingMessage;
-
   const newContent = streamingMessageState?.content ?? [];
 
   switch (chunkData.type) {
     case "text-start":
+      const lastPart = newContent[newContent.length - 1];
+      if (lastPart && lastPart.type === "reasoning" && lastPart.isStreaming) {
+        lastPart.isStreaming = false;
+      }
+
       newContent.push({
         type: "text",
         text: chunkData.textDelta,
@@ -88,16 +92,6 @@ function toUIStreamingMessage(chunkData: {
     case "reasoning-delta":
       newContent[newContent.length - 1].text += chunkData.textDelta;
       break;
-  }
-
-  const lastPart = newContent[newContent.length - 1];
-  if (
-    chunkData.type.includes("start") &&
-    lastPart &&
-    lastPart.type === "reasoning" &&
-    lastPart.isStreaming
-  ) {
-    lastPart.isStreaming = false;
   }
 
   useChatStore.setState({
