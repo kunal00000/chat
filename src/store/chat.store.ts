@@ -27,6 +27,7 @@ export type TChatStore = {
   input: string;
   setInput: (input: string) => void;
   sendMessage: (content: string) => Promise<string | null>;
+  retryMessage: (messageId: string) => Promise<string | null>;
 
   streamingMessage: TAssistantMessage | null;
   isFirstChunkPending: () => boolean;
@@ -85,6 +86,59 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
           input: "",
           error: undefined,
         }));
+      } catch (err: unknown) {
+        let errorMsg = "Unknown error";
+        if (isErrorWithMessage(err)) {
+          errorMsg = err.message;
+        }
+        set({ error: errorMsg });
+      }
+
+      return chatId;
+    },
+    retryMessage: async (assistantMessageId: string) => {
+      if (useSSEStore.getState().isLoading()) {
+        toast.error("Please wait for the current message to finish");
+        return null;
+      }
+
+      const { chatId, messages } = get();
+      if (!chatId) {
+        toast.error("No chat session found");
+        return null;
+      }
+
+      // Find the assistant message index
+      const assistantIdx = messages.findIndex(
+        (msg) => msg.id === assistantMessageId && msg.role === "assistant"
+      );
+      if (assistantIdx === -1) {
+        toast.error("Assistant message not found");
+        return null;
+      }
+
+      // Find the previous user message before this assistant message
+      let userIdx = assistantIdx - 1;
+      while (userIdx >= 0 && messages[userIdx].role !== "user") {
+        userIdx--;
+      }
+      if (userIdx < 0) {
+        toast.error("No user message found before this assistant message");
+        return null;
+      }
+
+      // Slice up to and including the user message
+      const newMessages = messages.slice(0, userIdx + 1);
+
+      try {
+        await useSSEStore.getState().startStream({
+          chatId,
+          messages: newMessages,
+        });
+        set({
+          messages: newMessages,
+          error: undefined,
+        });
       } catch (err: unknown) {
         let errorMsg = "Unknown error";
         if (isErrorWithMessage(err)) {

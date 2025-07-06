@@ -1,12 +1,15 @@
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { cn } from '@/lib/utils'
+import { useChatStore } from '@/store/chat.store'
 import { TAssistantMessage } from '@/types-constants-schemas/client/chat.types'
+import { RefreshCcwIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Message, MessageAction, MessageActions, MessageContent } from '../ui/message'
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '../ui/reasoning'
 
 export function AssistantMessage({ message, isLastMessage }: { message: TAssistantMessage, isLastMessage: boolean }) {
     const { handleCopy, getCopyIcon } = useCopyToClipboard()
+    const retryMessage = useChatStore((s) => s.retryMessage)
 
     return (
         <Message
@@ -60,6 +63,16 @@ export function AssistantMessage({ message, isLastMessage }: { message: TAssista
                             onClick={() => handleCopy(message.id, message.content.map(part => part.type === "text" ? part.text : "").join(""))}
                         >
                             {getCopyIcon(message.id)}
+                        </Button>
+                    </MessageAction>
+                    <MessageAction tooltip="Retry" delayDuration={100}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => retryMessage(message.id)}
+                        >
+                            <RefreshCcwIcon />
                         </Button>
                     </MessageAction>
                 </MessageActions>

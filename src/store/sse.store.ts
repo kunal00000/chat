@@ -4,18 +4,12 @@ import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
 
-// SSE stream arguments and payload types
 export type TStartStreamArgs = {
   chatId: string;
   messages: TChatMessage[];
 };
 
-export type TRequestPayload = {
-  chatId: string;
-  messages: TChatMessage[];
-};
-
-export const useSSEStore = createBaseStore<TStartStreamArgs, TRequestPayload>({
+export const useSSEStore = createBaseStore<TStartStreamArgs, TStartStreamArgs>({
   url: "/api/chat",
   getRequestPayload: async (streamArgs) => {
     if (!streamArgs.chatId || !streamArgs.messages) return null;
