@@ -33,6 +33,15 @@ export type TChatStore = {
   isFirstChunkPending: () => boolean;
 
   error?: string;
+
+  // Edit message state and actions
+  editingMessageId: string | null;
+  startEditingMessage: (messageId: string) => void;
+  cancelEditingMessage: () => void;
+  editUserMessage: (
+    messageId: string,
+    newContent: string
+  ) => Promise<string | null>;
 };
 
 export const useChatStore = createWithEqualityFn<TChatStore>()(
@@ -43,6 +52,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
     input: "",
     error: undefined,
     chatId: null,
+    editingMessageId: null,
     setInput: (input) => set({ input }),
     isFirstChunkPending: () => {
       return (
@@ -147,6 +157,52 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
         set({ error: errorMsg });
       }
 
+      return chatId;
+    },
+    startEditingMessage: (messageId) => set({ editingMessageId: messageId }),
+    cancelEditingMessage: () => set({ editingMessageId: null }),
+    editUserMessage: async (messageId, newContent) => {
+      if (useSSEStore.getState().isLoading()) {
+        toast.error("Please wait for the current message to finish");
+        return null;
+      }
+      const { chatId, messages } = get();
+      if (!chatId) {
+        toast.error("No chat session found");
+        return null;
+      }
+      // Find the user message index
+      const userIdx = messages.findIndex(
+        (msg) => msg.id === messageId && msg.role === "user"
+      );
+      if (userIdx === -1) {
+        toast.error("User message not found");
+        return null;
+      }
+      // Slice up to and including the edited user message
+      const newMessages = messages.slice(0, userIdx + 1).map((msg, idx) => {
+        if (idx === userIdx && msg.role === "user") {
+          return { ...msg, content: newContent };
+        }
+        return msg;
+      });
+      try {
+        await useSSEStore.getState().startStream({
+          chatId,
+          messages: newMessages,
+        });
+        set({
+          messages: newMessages,
+          editingMessageId: null,
+          error: undefined,
+        });
+      } catch (err: unknown) {
+        let errorMsg = "Unknown error";
+        if (isErrorWithMessage(err)) {
+          errorMsg = err.message;
+        }
+        set({ error: errorMsg });
+      }
       return chatId;
     },
   }),

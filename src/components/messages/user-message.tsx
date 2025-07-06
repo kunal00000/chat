@@ -1,13 +1,102 @@
+"use client"
+
+import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea } from '@/components/ui/prompt-input'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { shouldUseMaxWidthMessage } from '@/lib/chat.helpers'
 import { cn } from '@/lib/utils'
+import { useChatStore } from '@/store/chat.store'
 import { TUserMessage } from '@/types-constants-schemas/client/chat.types'
-import { PencilIcon, TrashIcon } from 'lucide-react'
+import { ArrowUp, PencilIcon, TrashIcon, X as XIcon } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '../ui/button'
 import { Message, MessageAction, MessageActions, MessageContent } from '../ui/message'
 
+function UserMessageEditBar({ message }: { message: TUserMessage }) {
+    const [localValue, setLocalValue] = useState(message.content)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const { cancelEditingMessage, editUserMessage } = useChatStore(s => ({
+        cancelEditingMessage: s.cancelEditingMessage,
+        editUserMessage: s.editUserMessage
+    }))
+
+    useEffect(() => {
+        setLocalValue(message.content)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [message.id])
+
+    const handleSubmit = async () => {
+        if (!localValue.trim()) return
+        if (localValue === message.content) {
+            toast.error("You didn't make any changes")
+            return
+        }
+        setIsSubmitting(true)
+        await editUserMessage(message.id, localValue)
+        setIsSubmitting(false)
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Escape') {
+            cancelEditingMessage()
+        }
+    }
+
+    return (
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-4 pb-4">
+            <PromptInput
+                value={localValue}
+                onValueChange={setLocalValue}
+                onSubmit={handleSubmit}
+                isLoading={isSubmitting}
+                className="bg-secondary-custom w-full"
+            >
+                <PromptInputTextarea
+                    onKeyDown={handleKeyDown}
+                    placeholder="Edit your message..."
+                    className="text-base leading-[1.3]"
+                    autoFocus
+                />
+                <PromptInputActions className="mt-auto flex w-full items-center justify-end gap-2">
+                    <PromptInputAction tooltip="Cancel">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="rounded-full bg-secondary-custom border-custom-dark shadow-none"
+                            onClick={cancelEditingMessage}
+                            type="button"
+                        >
+                            <XIcon size={18} />
+                        </Button>
+                    </PromptInputAction>
+                    <PromptInputAction tooltip="Send">
+                        <Button
+                            variant="default"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={handleSubmit}
+                            disabled={!localValue.trim() || isSubmitting}
+                            type="button"
+                        >
+                            <ArrowUp size={18} />
+                        </Button>
+                    </PromptInputAction>
+                </PromptInputActions>
+            </PromptInput>
+        </div>
+    )
+}
+
 export function UserMessage({ message }: { message: TUserMessage }) {
     const { handleCopy, getCopyIcon } = useCopyToClipboard()
+    const editingMessageId = useChatStore(s => s.editingMessageId)
+    const startEditingMessage = useChatStore(s => s.startEditingMessage)
+
+    const isEditing = editingMessageId === message.id
+
+    if (isEditing) {
+        return <UserMessageEditBar message={message} />
+    }
 
     return (
         <Message
@@ -33,6 +122,7 @@ export function UserMessage({ message }: { message: TUserMessage }) {
                             variant="ghost"
                             size="icon"
                             className="rounded-full"
+                            onClick={() => startEditingMessage(message.id)}
                         >
                             <PencilIcon />
                         </Button>
