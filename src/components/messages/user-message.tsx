@@ -6,7 +6,7 @@ import { shouldUseMaxWidthMessage } from '@/lib/chat.helpers'
 import { cn } from '@/lib/utils'
 import { useChatStore } from '@/store/chat.store'
 import { TUserMessage } from '@/types-constants-schemas/client/chat.types'
-import { ArrowUp, PencilIcon, TrashIcon, X as XIcon } from 'lucide-react'
+import { ArrowUp, SquarePenIcon, X as XIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '../ui/button'
@@ -117,25 +117,6 @@ export function UserMessage({ message }: { message: TUserMessage }) {
                         "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
                     )}
                 >
-                    <MessageAction tooltip="Edit" delayDuration={100}>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => startEditingMessage(message.id)}
-                        >
-                            <PencilIcon />
-                        </Button>
-                    </MessageAction>
-                    <MessageAction tooltip="Delete" delayDuration={100}>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                        >
-                            <TrashIcon />
-                        </Button>
-                    </MessageAction>
                     <MessageAction tooltip="Copy" delayDuration={100}>
                         <Button
                             variant="ghost"
@@ -144,6 +125,16 @@ export function UserMessage({ message }: { message: TUserMessage }) {
                             onClick={() => handleCopy(message.id, message.content)}
                         >
                             {getCopyIcon(message.id)}
+                        </Button>
+                    </MessageAction>
+                    <MessageAction tooltip="Edit" delayDuration={100}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => startEditingMessage(message.id)}
+                        >
+                            <SquarePenIcon />
                         </Button>
                     </MessageAction>
                 </MessageActions>
