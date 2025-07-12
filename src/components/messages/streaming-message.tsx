@@ -29,7 +29,7 @@ export function StreamingMessage() {
 
                     if (part.type === "reasoning") {
                         return (
-                            <Reasoning key={part.text} isStreaming={part.state === "streaming"}>
+                            <Reasoning key={part.text} isStreaming={part.state === "streaming"} open={part.state === "streaming"}>
                                 <ReasoningTrigger>Thinking</ReasoningTrigger>
                                 <ReasoningContent
                                     markdown

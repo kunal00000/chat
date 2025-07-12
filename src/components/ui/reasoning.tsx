@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { ChevronDownIcon } from "lucide-react"
+import { ChevronRightIcon } from "lucide-react"
 import React, {
     createContext,
     useContext,
@@ -89,7 +89,7 @@ export type ReasoningTriggerProps = {
 
 function ReasoningTrigger({
     children,
-    className,
+    className = "-ml-1",
     textClassName = "text-main/80 text-sm",
     ...props
 }: ReasoningTriggerProps) {
@@ -101,15 +101,15 @@ function ReasoningTrigger({
             onClick={() => onOpenChange(!isOpen)}
             {...props}
         >
-            <span className={cn("text-primary", textClassName)}>{children}</span>
             <div
                 className={cn(
                     "transform transition-transform",
-                    isOpen ? "rotate-180" : ""
+                    isOpen ? "rotate-90" : ""
                 )}
             >
-                <ChevronDownIcon className="size-4" />
+                <ChevronRightIcon className="size-4" />
             </div>
+            <div className={cn("text-primary", textClassName)}>{children}</div>
         </button>
     )
 }
