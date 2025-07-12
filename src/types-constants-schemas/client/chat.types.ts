@@ -14,7 +14,7 @@ export type TUserMessage = z.infer<typeof userMessageSchema>;
 
 // tools types
 type TToolWebsearch = {
-  input: string;
+  input: string[];
   output: SourceUrlUIPart[];
 };
 
