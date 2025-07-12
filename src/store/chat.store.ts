@@ -185,7 +185,10 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
         if (idx === userIdx && msg.role === "user") {
           return {
             ...msg,
-            parts: [{ type: "text", text: newText }],
+            parts: [
+              ...msg.parts.filter((p) => p.type !== "text"),
+              { type: "text", text: newText },
+            ],
           } satisfies TChatMessage;
         }
         return msg;

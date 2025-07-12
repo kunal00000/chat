@@ -6,14 +6,16 @@ import { shouldUseMaxWidthMessage } from '@/lib/chat.helpers'
 import { cn } from '@/lib/utils'
 import { useChatStore } from '@/store/chat.store'
 import { TUserMessage } from '@/types-constants-schemas/client/chat.types'
-import { ArrowUp, SquarePenIcon, X as XIcon } from 'lucide-react'
+import { FileUIPart } from 'ai'
+import { ArrowUp, FileIcon, SquarePenIcon, X as XIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '../ui/button'
-import { Message, MessageAction, MessageActions, MessageContent } from '../ui/message'
+import { Message, MessageAction, MessageActions } from '../ui/message'
 
 function UserMessageEditBar({ message }: { message: TUserMessage }) {
-    const [localValue, setLocalValue] = useState(message.parts[0].text)
+    const textPartValue = message.parts.find(p => p.type === "text")?.text ?? ""
+    const [localValue, setLocalValue] = useState(textPartValue)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const { cancelEditingMessage, editUserMessage } = useChatStore(s => ({
         cancelEditingMessage: s.cancelEditingMessage,
@@ -21,13 +23,13 @@ function UserMessageEditBar({ message }: { message: TUserMessage }) {
     }))
 
     useEffect(() => {
-        setLocalValue(message.parts[0].text)
+        setLocalValue(textPartValue)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [message.id])
 
     const handleSubmit = async () => {
         if (!localValue.trim()) return
-        if (localValue === message.parts[0].text) {
+        if (localValue === textPartValue) {
             toast.error("You didn't make any changes")
             return
         }
@@ -93,6 +95,7 @@ export function UserMessage({ message }: { message: TUserMessage }) {
     const startEditingMessage = useChatStore(s => s.startEditingMessage)
 
     const isEditing = editingMessageId === message.id
+    const textPartValue = message.parts.filter(p => p.type === "text").map(p => p.text).join(" ")
 
     if (isEditing) {
         return <UserMessageEditBar message={message} />
@@ -107,11 +110,21 @@ export function UserMessage({ message }: { message: TUserMessage }) {
             )}
         >
             <div className="group flex flex-col items-end gap-1">
-                <MessageContent className={cn("bg-secondary-custom text-main/95 rounded-3xl px-5 py-2.5",
-                    shouldUseMaxWidthMessage(message.parts[0].text) && "max-w-[85%] sm:max-w-[75%]"
+                <div className="flex flex-wrap gap-2 items-end mt-2">
+                    {message.parts.filter(p => p.type !== "text" && p).map((pf, idx) => {
+                        if (pf.type === "file") {
+                            return <UserMessageFilePreview key={idx} file={pf} />
+                        }
+                        return null
+                    })}
+                </div>
+
+                <div className={cn(
+                    "bg-secondary-custom text-main/95 rounded-3xl px-5 py-2.5",
+                    shouldUseMaxWidthMessage(textPartValue) && "max-w-[85%] sm:max-w-[75%]"
                 )}>
-                    {message.parts[0].text}
-                </MessageContent>
+                    {textPartValue}
+                </div>
                 <MessageActions
                     className={cn(
                         "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
@@ -122,7 +135,7 @@ export function UserMessage({ message }: { message: TUserMessage }) {
                             variant="ghost"
                             size="icon"
                             className="rounded-full"
-                            onClick={() => handleCopy(message.id, message.parts[0].text)}
+                            onClick={() => handleCopy(message.id, textPartValue)}
                         >
                             {getCopyIcon(message.id)}
                         </Button>
@@ -141,4 +154,16 @@ export function UserMessage({ message }: { message: TUserMessage }) {
             </div>
         </Message>
     )
+}
+
+function UserMessageFilePreview({ file }: { file: FileUIPart }) {
+    if (file.mediaType.startsWith("image/")) {
+        // eslint-disable-next-line @next/next/no-img-element
+        return <img src={file.url} alt={file.filename} className="max-h-40 max-w-xs object-cover rounded-lg" />
+    }
+
+    return <div className="bg-secondary-custom rounded-3xl h-fit px-5 py-2.5 flex items-center gap-2 text-main/95">
+        <FileIcon size={16} />
+        <span className="max-w-[144px] truncate">{file.filename}</span>
+    </div>
 }
