@@ -6,10 +6,6 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from '../ui/reasoning'
 export function StreamingMessage() {
     const { streamingMessage, isFirstChunkPending } = useChatStore((s) => ({ streamingMessage: s.streamingMessage, isFirstChunkPending: s.isFirstChunkPending() }))
 
-    console.log({
-        reasoningStreaming: streamingMessage?.content.some((part) => part.type === "reasoning" && part.isStreaming),
-    })
-
     return (
         <Message
             key="streaming-assistant"
@@ -33,7 +29,7 @@ export function StreamingMessage() {
 
                     if (part.type === "reasoning") {
                         return (
-                            <Reasoning key={part.text} isStreaming={part.isStreaming}>
+                            <Reasoning key={part.text} isStreaming={part.state === "streaming"}>
                                 <ReasoningTrigger>Thinking</ReasoningTrigger>
                                 <ReasoningContent
                                     markdown
