@@ -1,5 +1,6 @@
 import { getMessageId } from "@/lib/chat.helpers";
 import { TextStreamPart, ToolSet } from "ai";
+import { v4 as uuid } from "uuid";
 import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
@@ -76,6 +77,40 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
 
     case "reasoning-end":
       if (lastPart.type === "reasoning") lastPart.state = "done";
+      break;
+
+    case "source":
+      if (chunkData.sourceType === "url") {
+        newContent.push({
+          type: "source-url",
+          sourceId: chunkData.id,
+          url: chunkData.url,
+          title: chunkData.title,
+        });
+      } else if (chunkData.sourceType === "document") {
+        newContent.push({
+          type: "source-document",
+          sourceId: chunkData.id,
+          mediaType: chunkData.mediaType,
+          title: chunkData.title,
+          filename: chunkData.filename,
+        });
+      }
+      break;
+
+    case "finish-step":
+      // websearch handling
+      const parsedInput = JSON.parse(
+        JSON.stringify(chunkData.providerMetadata?.google.groundingMetadata)
+      ).webSearchQueries;
+
+      newContent.push({
+        type: "tool-websearch",
+        toolCallId: uuid(),
+        state: "output-available",
+        input: parsedInput,
+        output: [...newContent.filter((part) => part.type === "source-url")],
+      });
       break;
 
     case "text-end":

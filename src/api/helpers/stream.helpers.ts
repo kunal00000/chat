@@ -60,8 +60,14 @@ export function createStreamer() {
           appendEvent(chunk, "start_stream");
           break;
 
-        case "start-step":
         case "finish-step":
+          if (chunk.providerMetadata?.google.groundingMetadata) {
+            const { providerMetadata } = chunk;
+            appendEvent({ providerMetadata, type: "finish-step" });
+          }
+          break;
+
+        case "start-step":
         case "finish":
         default:
           break;

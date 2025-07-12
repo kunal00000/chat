@@ -1,8 +1,9 @@
-import { TextUIPart, UIDataTypes, UIMessagePart, UITools } from "ai";
+import { TTools } from "@/types-constants-schemas/client/chat.types";
+import { TextUIPart, UIDataTypes, UIMessagePart } from "ai";
 import * as z from "zod/v4";
 
 const textPartSchema = z.custom<TextUIPart>();
-const uiMessagePartSchema = z.custom<UIMessagePart<UIDataTypes, UITools>>();
+const uiMessagePartSchema = z.custom<UIMessagePart<UIDataTypes, TTools>>();
 
 const baseMessageFields = z.object({
   id: z.string(),
