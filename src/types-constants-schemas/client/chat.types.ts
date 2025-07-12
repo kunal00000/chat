@@ -12,6 +12,8 @@ export type TAssistantMessage = z.infer<typeof assistantMessageSchema>;
 
 export type TUserMessage = z.infer<typeof userMessageSchema>;
 
+export type TPreviewFile = { file: File; base64: string; isLoading: boolean };
+
 // tools types
 type TToolWebsearch = {
   input: string[];
