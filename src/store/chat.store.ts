@@ -6,6 +6,7 @@ import { createWithEqualityFn } from "zustand/traditional";
 import {
   TAssistantMessage,
   TChatMessage,
+  TUserMessage,
 } from "../types-constants-schemas/client/chat.types";
 import { useSSEStore } from "./sse.store";
 
@@ -26,7 +27,7 @@ export type TChatStore = {
 
   input: string;
   setInput: (input: string) => void;
-  sendMessage: (content: string) => Promise<string | null>;
+  sendMessage: (parts: TUserMessage["parts"]) => Promise<string | null>;
   retryMessage: (messageId: string) => Promise<string | null>;
 
   streamingMessage: TAssistantMessage | null;
@@ -68,7 +69,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       set({ messages: [] });
       return;
     },
-    sendMessage: async (content: string) => {
+    sendMessage: async (parts: TUserMessage["parts"]) => {
       if (useSSEStore.getState().isLoading()) {
         toast.error("Please wait for the current message to finish");
         return null;
@@ -83,7 +84,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       const userMessage: TChatMessage = {
         id: getMessageId("user"),
         role: "user",
-        parts: [{ type: "text", text: content }],
+        parts,
       };
 
       try {
