@@ -40,7 +40,7 @@ export type TChatStore = {
   cancelEditingMessage: () => void;
   editUserMessage: (
     messageId: string,
-    newContent: string
+    newText: string
   ) => Promise<string | null>;
 };
 
@@ -83,7 +83,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       const userMessage: TChatMessage = {
         id: getMessageId("user"),
         role: "user",
-        content,
+        parts: [{ type: "text", text: content }],
       };
 
       try {
@@ -161,7 +161,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
     },
     startEditingMessage: (messageId) => set({ editingMessageId: messageId }),
     cancelEditingMessage: () => set({ editingMessageId: null }),
-    editUserMessage: async (messageId, newContent) => {
+    editUserMessage: async (messageId, newText) => {
       if (useSSEStore.getState().isLoading()) {
         toast.error("Please wait for the current message to finish");
         return null;
@@ -182,7 +182,10 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       // Slice up to and including the edited user message
       const newMessages = messages.slice(0, userIdx + 1).map((msg, idx) => {
         if (idx === userIdx && msg.role === "user") {
-          return { ...msg, content: newContent };
+          return {
+            ...msg,
+            parts: [{ type: "text", text: newText }],
+          } satisfies TChatMessage;
         }
         return msg;
       });

@@ -2,7 +2,7 @@ import { createStreamer } from "@/api/helpers/stream.helpers";
 import { chatControllerInputSchema } from "@/types-constants-schemas/server/chat/chat.schema";
 import { google } from "@ai-sdk/google";
 import { zValidator } from "@hono/zod-validator";
-import { smoothStream, streamText } from "ai";
+import { convertToModelMessages, smoothStream, streamText } from "ai";
 import { Env, Hono } from "hono";
 
 export const chatController = new Hono<Env>().post(
@@ -25,7 +25,7 @@ export const chatController = new Hono<Env>().post(
             },
           },
         },
-        messages,
+        messages: convertToModelMessages(messages),
         experimental_transform: smoothStream({
           chunking: /.{10}/m,
           delayInMs: 15,

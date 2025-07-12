@@ -14,7 +14,7 @@ export function StreamingMessage() {
             <div className="group flex w-full flex-col gap-0">
                 {isFirstChunkPending ? (
                     <PromptkitLoader variant="loading-dots" size="md" text="Loading" />
-                ) : streamingMessage && streamingMessage.content.map((part) => {
+                ) : streamingMessage && streamingMessage.parts.map((part) => {
                     if (part.type === "text") {
                         return (
                             <MessageContent

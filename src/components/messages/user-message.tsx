@@ -13,7 +13,7 @@ import { Button } from '../ui/button'
 import { Message, MessageAction, MessageActions, MessageContent } from '../ui/message'
 
 function UserMessageEditBar({ message }: { message: TUserMessage }) {
-    const [localValue, setLocalValue] = useState(message.content)
+    const [localValue, setLocalValue] = useState(message.parts[0].text)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const { cancelEditingMessage, editUserMessage } = useChatStore(s => ({
         cancelEditingMessage: s.cancelEditingMessage,
@@ -21,13 +21,13 @@ function UserMessageEditBar({ message }: { message: TUserMessage }) {
     }))
 
     useEffect(() => {
-        setLocalValue(message.content)
+        setLocalValue(message.parts[0].text)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [message.id])
 
     const handleSubmit = async () => {
         if (!localValue.trim()) return
-        if (localValue === message.content) {
+        if (localValue === message.parts[0].text) {
             toast.error("You didn't make any changes")
             return
         }
@@ -108,9 +108,9 @@ export function UserMessage({ message }: { message: TUserMessage }) {
         >
             <div className="group flex flex-col items-end gap-1">
                 <MessageContent className={cn("bg-secondary-custom text-main/95 rounded-3xl px-5 py-2.5",
-                    shouldUseMaxWidthMessage(message.content) && "max-w-[85%] sm:max-w-[75%]"
+                    shouldUseMaxWidthMessage(message.parts[0].text) && "max-w-[85%] sm:max-w-[75%]"
                 )}>
-                    {message.content}
+                    {message.parts[0].text}
                 </MessageContent>
                 <MessageActions
                     className={cn(
@@ -122,7 +122,7 @@ export function UserMessage({ message }: { message: TUserMessage }) {
                             variant="ghost"
                             size="icon"
                             className="rounded-full"
-                            onClick={() => handleCopy(message.id, message.content)}
+                            onClick={() => handleCopy(message.id, message.parts[0].text)}
                         >
                             {getCopyIcon(message.id)}
                         </Button>

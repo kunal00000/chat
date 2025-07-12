@@ -1,5 +1,5 @@
 import { getMessageId } from "@/lib/chat.helpers";
-import { ReasoningUIPart, TextStreamPart, ToolSet } from "ai";
+import { TextStreamPart, ToolSet } from "ai";
 import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
@@ -56,7 +56,8 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TStartStreamArgs>({
 
 function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
   const streamingMessageState = useChatStore.getState().streamingMessage;
-  const newContent = streamingMessageState?.content ?? [];
+  const newContent = streamingMessageState?.parts ?? [];
+  const lastPart = newContent[newContent.length - 1];
 
   switch (chunkData.type) {
     case "text-start":
@@ -69,11 +70,12 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
 
     case "reasoning":
     case "text":
-      newContent[newContent.length - 1].text += chunkData.text;
+      if (lastPart.type === "text" || lastPart.type === "reasoning")
+        lastPart.text += chunkData.text;
       break;
 
     case "reasoning-end":
-      (newContent[newContent.length - 1] as ReasoningUIPart).state = "done";
+      if (lastPart.type === "reasoning") lastPart.state = "done";
       break;
 
     case "text-end":
@@ -82,7 +84,7 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
 
   useChatStore.setState({
     streamingMessage: {
-      content: newContent,
+      parts: newContent,
       role: "assistant",
       id: streamingMessageState?.id ?? getMessageId("assistant"),
     },

@@ -1,39 +1,27 @@
+import { TextUIPart, UIDataTypes, UIMessagePart, UITools } from "ai";
 import * as z from "zod/v4";
-import { MESSAGE_PARTS } from "./chat.constants";
 
-const systemMessageSchema = z.object({
+const textPartSchema = z.custom<TextUIPart>();
+const uiMessagePartSchema = z.custom<UIMessagePart<UIDataTypes, UITools>>();
+
+const baseMessageFields = z.object({
   id: z.string(),
+  metadata: z.record(z.string(), z.any()).optional(), // metadata is optional and loose
+});
+
+export const systemMessageSchema = baseMessageFields.extend({
   role: z.literal("system"),
-  content: z.string(),
+  parts: z.array(textPartSchema),
 });
 
-const textPartSchema = z.object({
-  type: z.literal(MESSAGE_PARTS.Text),
-  text: z.string(),
-});
-
-const reasoningPartSchema = z.object({
-  type: z.literal(MESSAGE_PARTS.Reasoning),
-  text: z.string(),
-  state: z.enum(["streaming", "done"]),
-});
-
-const userMessageContentSchema = z.string();
-
-export const userMessageSchema = z.object({
-  id: z.string(),
+export const userMessageSchema = baseMessageFields.extend({
   role: z.literal("user"),
-  content: userMessageContentSchema,
+  parts: z.array(textPartSchema),
 });
 
-const assistantMessageContentSchema = z.array(
-  z.discriminatedUnion("type", [textPartSchema, reasoningPartSchema])
-);
-
-export const assistantMessageSchema = z.object({
-  id: z.string(),
+export const assistantMessageSchema = baseMessageFields.extend({
   role: z.literal("assistant"),
-  content: assistantMessageContentSchema,
+  parts: z.array(uiMessagePartSchema),
 });
 
 export const chatMessageSchema = z.discriminatedUnion("role", [

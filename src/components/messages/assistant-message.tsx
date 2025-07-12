@@ -20,7 +20,7 @@ export function AssistantMessage({ message, isLastMessage }: { message: TAssista
             )}
         >
             <div className="group flex w-full flex-col gap-0">
-                {message.content.map((part) => {
+                {message.parts.map((part) => {
                     if (part.type === "text") {
                         return (
                             <MessageContent
@@ -60,7 +60,7 @@ export function AssistantMessage({ message, isLastMessage }: { message: TAssista
                             variant="ghost"
                             size="icon"
                             className="rounded-full"
-                            onClick={() => handleCopy(message.id, message.content.map(part => part.type === "text" ? part.text : "").join(""))}
+                            onClick={() => handleCopy(message.id, message.parts.map(part => part.type === "text" ? part.text : "").join(""))}
                         >
                             {getCopyIcon(message.id)}
                         </Button>
