@@ -106,7 +106,7 @@ export function PromptBarInput({
                                     onClick={() => useSSEStore.getState().stopStream()}
                                     className="size-9 rounded-full"
                                 >
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="10" height="10" rx="2" fill="currentColor" /></svg>
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="14" height="14" rx="2" fill="currentColor" /></svg>
                                 </Button>
                             ) : (
                                 <Button
