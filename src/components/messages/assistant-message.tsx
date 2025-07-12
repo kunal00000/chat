@@ -35,7 +35,7 @@ export function AssistantMessage({ message, isLastMessage }: { message: TAssista
 
                     if (part.type === "reasoning") {
                         return (
-                            <Reasoning key={part.text} isStreaming={part.isStreaming}>
+                            <Reasoning key={part.text} isStreaming={part.state === "streaming"}>
                                 <ReasoningTrigger>Thinking</ReasoningTrigger>
                                 <ReasoningContent
                                     markdown

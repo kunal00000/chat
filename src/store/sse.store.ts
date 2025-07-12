@@ -1,5 +1,5 @@
 import { getMessageId } from "@/lib/chat.helpers";
-import { TextStreamPart, ToolSet } from "ai";
+import { ReasoningUIPart, TextStreamPart, ToolSet } from "ai";
 import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
@@ -64,7 +64,7 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
       break;
 
     case "reasoning-start":
-      newContent.push({ type: "reasoning", text: "", isStreaming: true });
+      newContent.push({ type: "reasoning", text: "", state: "streaming" });
       break;
 
     case "reasoning":
@@ -73,9 +73,7 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
       break;
 
     case "reasoning-end":
-      (
-        newContent[newContent.length - 1] as { isStreaming: boolean }
-      ).isStreaming = false;
+      (newContent[newContent.length - 1] as ReasoningUIPart).state = "done";
       break;
 
     case "text-end":
