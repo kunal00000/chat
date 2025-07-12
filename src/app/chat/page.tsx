@@ -7,9 +7,8 @@ export default async function ChatHomePage() {
 
     return (
         <main className="relative flex h-[100dvh] md:rounded-tl-md md:ml-2 md:mt-2 flex-col overflow-hidden bg-background-custom">
-            <header className={cn("absolute top-0 z-10 flex h-14 w-full items-center gap-2 px-4", "border-b border-border-custom/50 backdrop-blur-xl")}>
+            <header className={cn("absolute top-0 z-10 flex h-14 w-full items-center gap-2 px-4")}>
                 <SidebarTrigger className="-ml-1" />
-                <div className="text-foreground">Project roadmap discussion</div>
             </header>
 
             <div
