@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { MorphingText } from "../ui/morphing-text";
 
 const promptSuggestions = [
     "What are you working on?",
@@ -14,14 +15,19 @@ const promptSuggestions = [
     "Let's get started!",
 ];
 
-export default function RandomHeaders() {
-    const [randomHeader, setRandomHeader] = useState("");
+function shuffleArray<T>(array: T[]): T[] {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
 
-    useEffect(() => {
-        setRandomHeader(promptSuggestions[Math.floor(Math.random() * promptSuggestions.length)]);
-    }, []);
+export default function RandomHeaders() {
+    const shuffledPromptSuggestions = useMemo(() => shuffleArray(promptSuggestions), []);
 
     return (
-        <div className="mb-8 text-4xl text-foreground-custom text-center">{randomHeader}</div>
+        <MorphingText texts={shuffledPromptSuggestions} />
     )
 }
