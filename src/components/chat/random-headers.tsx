@@ -24,10 +24,10 @@ function shuffleArray<T>(array: T[]): T[] {
     return arr;
 }
 
-export default function RandomHeaders() {
+export default function RandomHeaders({ className }: { className?: string }) {
     const shuffledPromptSuggestions = useMemo(() => shuffleArray(promptSuggestions), []);
 
     return (
-        <MorphingText texts={shuffledPromptSuggestions} />
+        <MorphingText texts={shuffledPromptSuggestions} className={className} />
     )
 }
