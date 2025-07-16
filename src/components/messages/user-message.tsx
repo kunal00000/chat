@@ -2,7 +2,6 @@
 
 import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea } from '@/components/ui/prompt-input'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { useIsMobile } from '@/hooks/use-mobile'
 import { shouldUseMaxWidthMessage } from '@/lib/chat.helpers'
 import { cn } from '@/lib/utils'
 import { useChatStore } from '@/store/chat.store'
@@ -15,7 +14,6 @@ import { Button } from '../ui/button'
 import { Message, MessageAction, MessageActions } from '../ui/message'
 
 function UserMessageEditBar({ message }: { message: TUserMessage }) {
-    const isMobile = useIsMobile()
     const textPartValue = message.parts.find(p => p.type === "text")?.text ?? ""
     const [localValue, setLocalValue] = useState(textPartValue)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -59,7 +57,7 @@ function UserMessageEditBar({ message }: { message: TUserMessage }) {
                     onKeyDown={handleKeyDown}
                     placeholder="Edit your message..."
                     className="text-base leading-[1.3]"
-                    autoFocus={!isMobile}
+                    autoFocus
                 />
                 <PromptInputActions className="mt-auto flex w-full items-center justify-end gap-2">
                     <PromptInputAction tooltip="Cancel">
