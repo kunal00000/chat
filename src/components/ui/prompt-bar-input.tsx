@@ -7,6 +7,7 @@ import {
     PromptInputActions,
     PromptInputTextarea,
 } from "@/components/ui/prompt-input"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
 import { useSSEStore } from "@/store/sse.store"
@@ -40,6 +41,7 @@ export function PromptBarInput({
     navigateToChat = false,
     showSuggestions = false,
 }: PromptBarInputProps) {
+    const isMobile = useIsMobile()
     const nextRouter = useRouter()
     const { input, setInput, sendMessage } = useChatStore((s) => ({
         input: s.input,
@@ -116,7 +118,7 @@ export function PromptBarInput({
                         <PromptInputTextarea
                             placeholder={placeholder}
                             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
-                            autoFocus
+                            autoFocus={!isMobile}
                         />
 
                         <PromptInputActions className={cn("mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3", !showAdditionalActions && "justify-end")}>
