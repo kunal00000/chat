@@ -16,7 +16,7 @@ export const chatController = new Hono<Env>().post(
 
     (async () => {
       const llmStreamResponse = streamText({
-        model: google("gemini-2.5-flash-preview-04-17"),
+        model: google("gemini-2.5-flash"),
         providerOptions: {
           google: {
             useSearchGrounding: true,

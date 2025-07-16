@@ -235,11 +235,8 @@ function PromptBarSuggestions({ input, setInput }: { input: string, setInput: (i
                         ))}
                     </div>
                 ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ duration: 0.45 }}
-                        className="relative flex w-full flex-wrap items-stretch justify-start gap-2">
+                    <div
+                        className="relative flex w-full flex-wrap items-stretch justify-center gap-2">
                         {SUGGESTION_GROUPS.map((suggestion) => (
                             <PromptSuggestion
                                 key={suggestion.label}
@@ -247,14 +244,14 @@ function PromptBarSuggestions({ input, setInput }: { input: string, setInput: (i
                                     setActiveCategory(suggestion.label)
                                     setInput(suggestion.label)
                                 }}
-                                className="capitalize bg-secondary rounded-lg shadow-none"
+                                className="capitalize bg-border-custom/25 border-border-custom/50 rounded-lg shadow-none"
                                 size={"default"}
                             >
                                 <BrainIcon className="h-4 w-4" />
                                 {suggestion.label}
                             </PromptSuggestion>
                         ))}
-                    </motion.div>
+                    </div>
                 )}
             </div>
         </div>
