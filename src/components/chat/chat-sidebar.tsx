@@ -18,6 +18,7 @@ import {
     Search
 } from "lucide-react"
 import Link from "next/link"
+import TooltipWrapper from "../common/tooltip-wrapper"
 import Logo from "../ui/icons/logo"
 
 export function ChatSidebar() {
@@ -27,9 +28,11 @@ export function ChatSidebar() {
                 <Link href={PATHS.NEW_CHAT}>
                     <Logo className="size-8 rounded-md" />
                 </Link>
-                <Button variant="ghost" className="size-8">
-                    <Search className="size-4" />
-                </Button>
+                <TooltipWrapper tooltip="Pending Implementation" side="right">
+                    <Button variant="ghost" className="size-8">
+                        <Search className="size-4" />
+                    </Button>
+                </TooltipWrapper>
             </SidebarHeader>
             <SidebarContent className="pt-4 bg-border-custom/50">
                 <div className="px-4">
@@ -43,9 +46,11 @@ export function ChatSidebar() {
                         <SidebarGroupLabel>{group.period}</SidebarGroupLabel>
                         <SidebarMenu>
                             {group.conversations.map((conversation) => (
-                                <SidebarMenuButton key={conversation.id}>
-                                    <span>{conversation.title}</span>
-                                </SidebarMenuButton>
+                                <TooltipWrapper key={conversation.id} tooltip="Pending Implementation" side="right">
+                                    <SidebarMenuButton >
+                                        <span>{conversation.title}</span>
+                                    </SidebarMenuButton>
+                                </TooltipWrapper>
                             ))}
                         </SidebarMenu>
                     </SidebarGroup>
