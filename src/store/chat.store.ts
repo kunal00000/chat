@@ -23,6 +23,7 @@ function isErrorWithMessage(err: unknown): err is { message: string } {
 export type TChatStore = {
   chatId: string | null;
   messages: TChatMessage[];
+  chatTitle: string | null;
   loadMessagesForChatId: (chatId: string) => Promise<void>;
 
   input: string;
@@ -53,6 +54,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
     input: "",
     error: undefined,
     chatId: null,
+    chatTitle: null,
     editingMessageId: null,
     setInput: (input) => set({ input }),
     isFirstChunkPending: () => {

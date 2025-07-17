@@ -30,7 +30,9 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TStartStreamArgs>({
         case "message":
           toUIStreamingMessage(parsedData);
           break;
-
+        case "chat-title":
+          useChatStore.setState({ chatTitle: parsedData.chatTitle });
+          break;
         case "end_stream":
         default:
       }

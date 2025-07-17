@@ -2,7 +2,12 @@ import { createStreamer } from "@/api/helpers/stream.helpers";
 import { chatControllerInputSchema } from "@/types-constants-schemas/server/chat/chat.schema";
 import { google } from "@ai-sdk/google";
 import { zValidator } from "@hono/zod-validator";
-import { convertToModelMessages, smoothStream, streamText } from "ai";
+import {
+  convertToModelMessages,
+  generateText,
+  smoothStream,
+  streamText,
+} from "ai";
 import { Env, Hono } from "hono";
 
 export const chatController = new Hono<Env>().post(
@@ -15,6 +20,29 @@ export const chatController = new Hono<Env>().post(
     const response = streamer.toResponse();
 
     (async () => {
+      if (messages.filter((m) => m.role === "user").length === 1) {
+        (async () => {
+          const userMessage = messages.filter((m) => m.role === "user")[0];
+          const chatTitleStream = generateText({
+            model: google("gemini-2.5-flash"),
+            system:
+              "You are tasked with generating a title for a chat. The title should be a single sentence that captures the essence of the chat. The title should be no more than 8 words and no full stops.",
+            messages: [
+              {
+                role: "user",
+                content: `this is first message for chat: ${userMessage.parts
+                  .filter((p) => p.type === "text")
+                  .map((p) => p.type === "text" && p.text)
+                  .join(" ")}`,
+              },
+            ],
+          });
+
+          const chatTitle = (await chatTitleStream).text;
+          streamer.appendEvent({ chatTitle }, "chat-title");
+        })();
+      }
+
       const llmStreamResponse = streamText({
         model: google("gemini-2.5-flash"),
         providerOptions: {
