@@ -43,30 +43,34 @@ export const chatController = new Hono<Env>().post(
         })();
       }
 
-      const llmStreamResponse = streamText({
-        model: google("gemini-2.5-flash"),
-        providerOptions: {
-          google: {
-            useSearchGrounding: true,
-            thinkingConfig: {
-              includeThoughts: true,
+      try {
+        const llmStreamResponse = streamText({
+          model: google("gemini-2.5-flash"),
+          providerOptions: {
+            google: {
+              useSearchGrounding: true,
+              thinkingConfig: {
+                includeThoughts: true,
+              },
             },
           },
-        },
-        messages: convertToModelMessages(messages),
-        experimental_transform: smoothStream({
-          chunking: /.{10}/m,
-          delayInMs: 15,
-        }),
-        abortSignal: c.req.raw.signal,
-      });
+          messages: convertToModelMessages(messages),
+          experimental_transform: smoothStream({
+            chunking: /.{10}/m,
+            delayInMs: 15,
+          }),
+          abortSignal: c.req.raw.signal,
+        });
 
-      await streamer.streamFullStream(llmStreamResponse.fullStream);
+        await streamer.streamFullStream(llmStreamResponse.fullStream);
 
-      const usage = await llmStreamResponse.usage;
-      streamer.appendEvent({ usage }, "usage");
-
-      streamer.close();
+        const usage = await llmStreamResponse.usage;
+        streamer.appendEvent({ usage }, "usage");
+      } catch (error) {
+        streamer.appendEvent({ error }, "error");
+      } finally {
+        streamer.close();
+      }
     })();
 
     return response;
