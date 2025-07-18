@@ -17,7 +17,7 @@ export default function ChatHomePage() {
             </header>
 
             <div
-                className="absolute inset-x-0 h-full mx-auto flex max-w-3xl flex-col items-center justify-end md:justify-center gap-4 px-3 pb-3 md:px-5 md:pb-5">
+                className="absolute md:top-1/4 inset-x-0 h-full md:h-auto mx-auto flex max-w-3xl flex-col items-center justify-end md:justify-center gap-4 px-3 pb-3 md:px-5 md:pb-5">
                 <RandomHeaders className="absolute top-2/5 -translate-y-1/2 md:relative md:top-auto md:translate-y-0" />
                 <PromptBarInput
                     className="w-full"
