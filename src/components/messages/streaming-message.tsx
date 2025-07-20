@@ -19,7 +19,7 @@ export function StreamingMessage() {
                         return (
                             <MessageContent
                                 key={part.text}
-                                className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0"
+                                className="text-main/95 prose flex-1 rounded-lg bg-transparent p-0 max-w-full"
                                 markdown
                             >
                                 {part.text}
