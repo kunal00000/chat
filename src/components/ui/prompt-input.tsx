@@ -92,6 +92,14 @@ function PromptInput({
     )
 }
 
+const SKIP_KEYS = [
+    'Escape', 'Tab', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6',
+    'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Meta', 'Alt',
+    'Control', 'Shift', 'CapsLock', 'NumLock', 'ScrollLock',
+    'Insert', 'Delete', 'Home', 'End', 'PageUp', 'PageDown',
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
+]
+
 export type PromptInputTextareaProps = {
     disableAutosize?: boolean
 } & React.ComponentProps<typeof Textarea>
@@ -104,6 +112,30 @@ function PromptInputTextarea({
 }: PromptInputTextareaProps) {
     const { value, setValue, maxHeight, onSubmit, disabled } = usePromptInput()
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+    // Autofocus functionality - focus textarea when any key is pressed
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Don't focus if already focused or if it's a special key
+            if (document.activeElement === textareaRef.current) return
+
+            // Skip function keys, modifier keys, and navigation keys
+            if (SKIP_KEYS.includes(event.key)) return
+
+            // Don't focus if user is typing in another input/textarea
+            const activeElement = document.activeElement as HTMLElement
+            if (activeElement && (
+                activeElement.tagName === 'INPUT' ||
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.contentEditable === 'true'
+            )) return
+
+            textareaRef.current?.focus()
+        }
+
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [])
 
     useEffect(() => {
         if (disableAutosize) return

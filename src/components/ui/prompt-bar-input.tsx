@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/store/chat.store"
 import { useSSEStore } from "@/store/sse.store"
+import { PATHS } from "@/types-constants-schemas/client/chat.constants"
 import { TPreviewFile, TUserMessage } from "@/types-constants-schemas/client/chat.types"
 import { SUGGESTION_GROUPS } from "@/types-constants-schemas/client/prompt-kit.constants"
 import { motion } from "framer-motion"
@@ -78,7 +79,7 @@ export function PromptBarInput({
         const chatId = await sendMessage(parts);
 
         if (navigateToChat && chatId) {
-            nextRouter.push(`/chat/${chatId}`)
+            nextRouter.push(`${PATHS.NEW_CHAT}/${chatId}`)
         }
         return;
     }
@@ -116,7 +117,6 @@ export function PromptBarInput({
                         <PromptInputTextarea
                             placeholder={placeholder}
                             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
-                            autoFocus
                         />
 
                         <PromptInputActions className={cn("mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3", !showAdditionalActions && "justify-end")}>

@@ -1,4 +1,4 @@
 export const PATHS = {
-  NEW_CHAT: "/chat",
+  NEW_CHAT: "/c",
   LANDING_PAGE: "/",
 };
