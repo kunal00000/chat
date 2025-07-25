@@ -1,6 +1,5 @@
 import { getMessageId } from "@/lib/chat.helpers";
 import { TextStreamPart, ToolSet } from "ai";
-import { v4 as uuid } from "uuid";
 import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
 import { createBaseStore } from "./sse.helpers";
@@ -102,17 +101,17 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
 
     case "finish-step":
       // websearch handling
-      const parsedInput = JSON.parse(
-        JSON.stringify(chunkData.providerMetadata?.google.groundingMetadata)
-      ).webSearchQueries;
+      //   const parsedInput = JSON.parse(
+      //     JSON.stringify(chunkData.providerMetadata?.google.groundingMetadata)
+      //   ).webSearchQueries;
 
-      newContent.push({
-        type: "tool-websearch",
-        toolCallId: uuid(),
-        state: "output-available",
-        input: parsedInput,
-        output: [...newContent.filter((part) => part.type === "source-url")],
-      });
+      //   newContent.push({
+      //     type: "tool-websearch",
+      //     toolCallId: uuid(),
+      //     state: "output-available",
+      //     input: parsedInput,
+      //     output: [...newContent.filter((part) => part.type === "source-url")],
+      //   });
       break;
 
     case "text-end":
