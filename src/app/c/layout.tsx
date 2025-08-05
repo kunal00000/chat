@@ -19,7 +19,7 @@ export default function ChatLayout({
             <TooltipWrapper tooltip="View on GitHub" side="left">
                 <Button
                     variant="ghost"
-                    className="fixed bottom-4 right-4 size-10 text-black hover:text-black/70 bg-white/80 hover:bg-white/90 shadow-none rounded-full z-50"
+                    className="fixed bottom-4 right-4 hidden md:block size-10 text-black hover:text-black/70 bg-white/80 hover:bg-white/90 shadow-none rounded-full z-50"
                     asChild
                 >
                     <a
