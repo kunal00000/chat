@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { navigateToChat } from "@/lib/navigation";
+import { cn } from "@/lib/utils";
 import { Edit3, MessageSquare, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -93,28 +94,15 @@ export function ChatHistory() {
                                             autoFocus
                                             onClick={(e) => e.stopPropagation()}
                                         />
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
+                                        <div
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleSaveTitle(chat.id);
                                             }}
-                                            className="h-6 px-2"
+                                            className={cn("h-6", buttonVariants({ variant: "ghost", size: "sm" }))}
                                         >
                                             Save
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleCancelEdit();
-                                            }}
-                                            className="h-6 px-2"
-                                        >
-                                            Cancel
-                                        </Button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="flex items-center space-x-2">
@@ -127,25 +115,21 @@ export function ChatHistory() {
 
                             {editingChatId !== chat.id && (
                                 <div className="flex items-center space-x-1 bg-accent opacity-0 group-hover/menu-item:opacity-100 transition-opacity absolute right-2">
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
+                                    <div
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleEditTitle(chat);
                                         }}
-                                        className="h-6 w-6 p-0"
+                                        className={cn("h-6 w-6 p-0", buttonVariants({ variant: "ghost", size: "sm" }))}
                                     >
                                         <Edit3 className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
+                                    </div>
+                                    <div
                                         onClick={(e) => handleDeleteChat(chat.id, e)}
-                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                        className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-6 w-6 p-0 text-red-500 hover:text-red-700")}
                                     >
                                         <Trash2 className="h-3 w-3" />
-                                    </Button>
+                                    </div>
                                 </div>
                             )}
                         </SidebarMenuButton>
