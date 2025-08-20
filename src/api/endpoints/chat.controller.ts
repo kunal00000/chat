@@ -51,14 +51,6 @@ export const chatController = new Hono<Env>().post(
             url_context: google.tools.urlContext({}),
             code_execution: google.tools.codeExecution({}),
           },
-          providerOptions: {
-            google: {
-              useSearchGrounding: true,
-              thinkingConfig: {
-                includeThoughts: true,
-              },
-            },
-          },
           messages: convertToModelMessages(messages),
           experimental_transform: smoothStream({
             chunking: /.{10}/m,
