@@ -37,10 +37,10 @@ export function createStreamer() {
   ) {
     for await (const chunk of fullStream) {
       switch (chunk.type) {
-        case "text":
+        case "text-delta":
         case "text-end":
         case "text-start":
-        case "reasoning":
+        case "reasoning-delta":
         case "reasoning-end":
         case "reasoning-start":
         case "tool-call":

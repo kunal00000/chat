@@ -70,8 +70,8 @@ function toUIStreamingMessage(chunkData: TextStreamPart<ToolSet>) {
       newContent.push({ type: "reasoning", text: "", state: "streaming" });
       break;
 
-    case "reasoning":
-    case "text":
+    case "reasoning-delta":
+    case "text-delta":
       if (lastPart.type === "text" || lastPart.type === "reasoning")
         lastPart.text += chunkData.text;
       break;
