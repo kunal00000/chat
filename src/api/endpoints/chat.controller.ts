@@ -25,11 +25,6 @@ export const chatController = new Hono<Env>().post(
           const userMessage = messages.filter((m) => m.role === "user")[0];
           const chatTitleStream = generateText({
             model: google("gemini-2.5-flash"),
-            tools: {
-              google_search: google.tools.googleSearch({}),
-              url_context: google.tools.urlContext({}),
-              code_execution: google.tools.codeExecution({}),
-            },
             system:
               "You are tasked with generating a title for a chat. The title should be a single sentence that captures the essence of the chat. The title should be no more than 8 words and no full stops.",
             messages: [
@@ -51,6 +46,11 @@ export const chatController = new Hono<Env>().post(
       try {
         const llmStreamResponse = streamText({
           model: google("gemini-2.5-flash"),
+          tools: {
+            google_search: google.tools.googleSearch({}),
+            url_context: google.tools.urlContext({}),
+            code_execution: google.tools.codeExecution({}),
+          },
           providerOptions: {
             google: {
               useSearchGrounding: true,
