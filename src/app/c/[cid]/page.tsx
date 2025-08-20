@@ -10,9 +10,20 @@ import { useChatStore } from "@/store/chat.store";
 import { PATHS } from "@/types-constants-schemas/client/chat.constants";
 import { SquarePenIcon } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function ChatPage() {
-    const chatTitle = useChatStore(s => s.chatTitle);
+    const params = useParams();
+    const chatId = params.cid as string;
+    const { chatTitle, loadMessagesForChatId } = useChatStore();
+
+    useEffect(() => {
+        if (chatId) {
+            loadMessagesForChatId(chatId);
+        }
+    }, [chatId, loadMessagesForChatId]);
+
     return (
         <main className="relative flex h-[100dvh] md:rounded-tl-md md:ml-2 md:mt-2 flex-col overflow-hidden bg-background-custom">
             <header className={cn("absolute top-0 z-10 flex h-14 w-full items-center gap-2 px-4", "border-b border-border-custom/50 backdrop-blur-xl")}>

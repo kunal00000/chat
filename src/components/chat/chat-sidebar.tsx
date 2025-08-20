@@ -4,15 +4,10 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import {
     Sidebar,
     SidebarContent,
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton
+    SidebarHeader
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import { PATHS } from "@/types-constants-schemas/client/chat.constants"
-import { CONVERSATION_HISTORY } from "@/types-constants-schemas/client/prompt-kit.constants"
 import {
     PlusIcon,
     Search
@@ -20,6 +15,7 @@ import {
 import Link from "next/link"
 import TooltipWrapper from "../common/tooltip-wrapper"
 import Logo from "../ui/icons/logo"
+import { ChatHistory } from "./chat-history"
 
 export function ChatSidebar() {
     return (
@@ -41,20 +37,7 @@ export function ChatSidebar() {
                         <span>New Chat</span>
                     </Link>
                 </div>
-                {CONVERSATION_HISTORY.map((group) => (
-                    <SidebarGroup key={group.period}>
-                        <SidebarGroupLabel>{group.period}</SidebarGroupLabel>
-                        <SidebarMenu>
-                            {group.conversations.map((conversation) => (
-                                <TooltipWrapper key={conversation.id} tooltip="Pending Implementation" side="right">
-                                    <SidebarMenuButton >
-                                        <span>{conversation.title}</span>
-                                    </SidebarMenuButton>
-                                </TooltipWrapper>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroup>
-                ))}
+                <ChatHistory />
             </SidebarContent>
         </Sidebar>
     )

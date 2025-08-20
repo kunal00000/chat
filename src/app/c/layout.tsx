@@ -1,4 +1,5 @@
 import { ChatSidebar } from '@/components/chat/chat-sidebar'
+import FirstLoadEffect from '@/components/common/first-load-effect'
 import TooltipWrapper from '@/components/common/tooltip-wrapper'
 import { Button } from '@/components/ui/button'
 import GitHubIcon from '@/components/ui/icons/github'
@@ -31,6 +32,7 @@ export default function ChatLayout({
                     </a>
                 </Button>
             </TooltipWrapper>
+            <FirstLoadEffect />
         </SidebarProvider>
     )
 }

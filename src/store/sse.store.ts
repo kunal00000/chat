@@ -1,4 +1,6 @@
+import { chatEventEmitter } from "@/lib/chat-events";
 import { getMessageId } from "@/lib/chat.helpers";
+import { indexedDBService } from "@/lib/indexed-db";
 import { TextStreamPart, ToolSet } from "ai";
 import { TChatMessage } from "../types-constants-schemas/client/chat.types";
 import { useChatStore } from "./chat.store";
@@ -42,17 +44,31 @@ export const useSSEStore = createBaseStore<TStartStreamArgs, TStartStreamArgs>({
   onError: (error) => {
     console.error("SSE error", error);
   },
-  onClose: () => {
+  onClose: async () => {
     console.log("SSE stream closed");
-    useChatStore.setState((state) => {
-      if (state.streamingMessage) {
-        return {
-          messages: [...state.messages, state.streamingMessage],
-          streamingMessage: null,
-        };
+    const state = useChatStore.getState();
+    if (state.streamingMessage && state.chatId) {
+      try {
+        // Save assistant message to IndexedDB
+        await indexedDBService.saveMessage(
+          state.chatId,
+          state.streamingMessage
+        );
+
+        // Update chat title if it's available
+        if (state.chatTitle) {
+          await indexedDBService.updateChatTitle(state.chatId, state.chatTitle);
+          chatEventEmitter.emit("chat-updated");
+        }
+      } catch (error) {
+        console.error("Error saving assistant message to IndexedDB:", error);
       }
-      return {};
-    });
+
+      useChatStore.setState({
+        messages: [...state.messages, state.streamingMessage],
+        streamingMessage: null,
+      });
+    }
   },
 });
 

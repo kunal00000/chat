@@ -120,7 +120,7 @@ function PromptInputTextarea({
             if (document.activeElement === textareaRef.current) return
 
             // Skip function keys, modifier keys, and navigation keys
-            if (SKIP_KEYS.includes(event.key)) return
+            if (SKIP_KEYS.includes(event.key) || (event.key == "c" && event.metaKey)) return
 
             // Don't focus if user is typing in another input/textarea
             const activeElement = document.activeElement as HTMLElement
@@ -130,7 +130,10 @@ function PromptInputTextarea({
                 activeElement.contentEditable === 'true'
             )) return
 
-            textareaRef.current?.focus()
+            // Only focus on actual typing keys (letters, numbers, symbols)
+            if (event.key.length === 1 || event.key === 'Backspace' || event.key === 'Delete') {
+                textareaRef.current?.focus()
+            }
         }
 
         document.addEventListener('keydown', handleKeyDown)

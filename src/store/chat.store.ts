@@ -1,4 +1,7 @@
+import { chatEventEmitter } from "@/lib/chat-events";
 import { getMessageId } from "@/lib/chat.helpers";
+import { indexedDBService } from "@/lib/indexed-db";
+import { navigateToChat } from "@/lib/navigation";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import { shallow } from "zustand/shallow";
@@ -25,6 +28,10 @@ export type TChatStore = {
   messages: TChatMessage[];
   chatTitle: string | null;
   loadMessagesForChatId: (chatId: string) => Promise<void>;
+  loadAllChats: () => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
+  updateChatTitle: (chatId: string, title: string) => Promise<void>;
+  refreshChatHistory: () => Promise<void>;
 
   input: string;
   setInput: (input: string) => void;
@@ -65,11 +72,55 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       );
     },
     loadMessagesForChatId: async (chatId) => {
-      // Implement your logic to load messages for a chatId
-      // This is a placeholder; replace with your actual logic
-      console.log("Loading messages for chatId:", chatId);
-      set({ messages: [] });
-      return;
+      try {
+        const messages = await indexedDBService.getMessages(chatId);
+        const chat = await indexedDBService.getChat(chatId);
+        set({
+          messages,
+          chatId,
+          chatTitle: chat?.title || null,
+        });
+      } catch (error) {
+        console.error("Error loading messages:", error);
+        // If chat doesn't exist yet, set it up as a new chat
+        set({ messages: [], chatId, chatTitle: null });
+      }
+    },
+    loadAllChats: async () => {
+      try {
+        const chats = await indexedDBService.getAllChats();
+        // This could be used to populate a chat list
+        console.log("Loaded chats:", chats);
+      } catch (error) {
+        console.error("Error loading chats:", error);
+      }
+    },
+    deleteChat: async (chatId) => {
+      try {
+        await indexedDBService.deleteChat(chatId);
+        if (get().chatId === chatId) {
+          set({ chatId: null, messages: [], chatTitle: null });
+        }
+      } catch (error) {
+        console.error("Error deleting chat:", error);
+        toast.error("Failed to delete chat");
+      }
+    },
+    updateChatTitle: async (chatId, title) => {
+      try {
+        await indexedDBService.updateChatTitle(chatId, title);
+        if (get().chatId === chatId) {
+          set({ chatTitle: title });
+        }
+        chatEventEmitter.emit("chat-updated");
+      } catch (error) {
+        console.error("Error updating chat title:", error);
+        toast.error("Failed to update chat title");
+      }
+    },
+    refreshChatHistory: async () => {
+      // This method can be called to trigger a refresh of chat history
+      // The actual refresh is handled by the useChatHistory hook
     },
     sendMessage: async (parts: TUserMessage["parts"]) => {
       if (useSSEStore.getState().isLoading()) {
@@ -81,6 +132,7 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       if (!chatId) {
         chatId = uuid();
         set({ chatId, messages: [] });
+        navigateToChat(chatId);
       }
 
       const userMessage: TChatMessage = {
@@ -90,6 +142,18 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       };
 
       try {
+        // Save user message to IndexedDB
+        await indexedDBService.saveMessage(chatId, userMessage);
+
+        // Save chat if it's new
+        if (get().messages.length === 0) {
+          await indexedDBService.saveChat(chatId, null);
+          // Trigger a refresh of chat history when a new chat is created
+          setTimeout(() => {
+            // This will trigger the useEffect in useChatHistory
+          }, 100);
+        }
+
         await useSSEStore
           .getState()
           .startStream({ chatId, messages: [...get().messages, userMessage] });
@@ -144,6 +208,18 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
       const newMessages = messages.slice(0, userIdx + 1);
 
       try {
+        // Update messages in IndexedDB (remove messages after the user message)
+        const messagesToKeep = newMessages;
+        const currentMessages = await indexedDBService.getMessages(chatId);
+        const userMessageIds = new Set(messagesToKeep.map((m) => m.id));
+
+        // Remove messages that are no longer in the conversation
+        for (const message of currentMessages) {
+          if (!userMessageIds.has(message.id)) {
+            await indexedDBService.deleteMessage(chatId, message.id);
+          }
+        }
+
         await useSSEStore.getState().startStream({
           chatId,
           messages: newMessages,
@@ -196,6 +272,21 @@ export const useChatStore = createWithEqualityFn<TChatStore>()(
         return msg;
       });
       try {
+        // Update the edited message in IndexedDB
+        const editedMessage = newMessages[userIdx];
+        await indexedDBService.saveMessage(chatId, editedMessage);
+
+        // Remove messages after the edited message
+        const currentMessages = await indexedDBService.getMessages(chatId);
+        const messagesToKeep = newMessages;
+        const userMessageIds = new Set(messagesToKeep.map((m) => m.id));
+
+        for (const message of currentMessages) {
+          if (!userMessageIds.has(message.id)) {
+            await indexedDBService.deleteMessage(chatId, message.id);
+          }
+        }
+
         await useSSEStore.getState().startStream({
           chatId,
           messages: newMessages,
